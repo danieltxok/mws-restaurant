@@ -15,5 +15,21 @@
   "bugs": {
     "url": "https://github.com/dbarcosb/mws-restaurant/issues"
   },
-  "homepage": "https://github.com/dbarcosb/mws-restaurant#readme"
+  "homepage": "https://github.com/dbarcosb/mws-restaurant#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "browser-sync": "^2.23.6",
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^4.1.0",
+    "gulp-babel": "^7.0.1",
+    "gulp-cache": "^1.0.2",
+    "gulp-cssnano": "^2.1.2",
+    "gulp-eslint": "^4.0.2",
+    "gulp-htmlmin": "^4.0.0",
+    "gulp-sass": "^3.1.0",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-uglify": "^3.0.0",
+    "run-sequence": "^2.2.1"
+  }
 }
