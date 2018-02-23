@@ -1,0 +1,19 @@
+{
+  "name": "mws-restaurant",
+  "version": "1.0.0",
+  "description": "Restaurant Webapp for the Udacity Nanodegree",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dbarcosb/mws-restaurant.git"
+  },
+  "author": "dbarcosb",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dbarcosb/mws-restaurant/issues"
+  },
+  "homepage": "https://github.com/dbarcosb/mws-restaurant#readme"
+}
