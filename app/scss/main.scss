@@ -3,16 +3,24 @@
 // Media queries
 @import 'imports/_media-queries.scss';
 
+// html
+html {
+    overflow: hidden;
+    height: 100%;
+} 
+
 // body
 body {
     padding: 0;
     margin: 0;
     background-color: $background-color;
     font-family: $first-font;
-    font-size: $first-font-size;
+    font-size: 10pt;
     color: $first-font-color;
     line-height: 1.5em;
     display: block;
+    height: 100%;
+    overflow: auto;
 }
 
 // header
@@ -47,7 +55,7 @@ main {
     #restaurantscontainer {
         .filter-options {
             width: 100%;
-            padding: 20px 0 30px 0;
+            padding: 20px 0 30px;
             background-color: $hover-a-color;
             display: grid;
             grid-gap: 20px;
@@ -71,21 +79,80 @@ main {
                 height: 50px;
             }
         }
+        #restaurants-list {
+            background-color: $background-color-list;
+            list-style: none;
+            margin: 0;
+            padding: 5vw 5vw;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-gap: 5vw;
+            li {
+                background-color: $background-color;
+                border: 2px solid $border-color;
+                font-family: $second-font;
+                display: grid;
+                grid-template-columns: 20px 1fr 10px;
+                grid-template-rows: repeat(5, auto);
+                margin: 0;
+                .restaurant-img {
+                    background-color: #ccc;
+                    margin: 0;
+                    max-width: 100%;
+                    grid-column: 1 / -1;
+                }
+                h1 {
+                    color: $list-title-color;
+                    font-weight: 200;
+                    margin: 20px 0 10px;
+                    text-transform: uppercase;
+                    grid-column-start: 2;
+                }
+                p {
+                    margin: 0;
+                    font-size: 11pt;
+                    grid-column-start: 2;
+                }
+                a {
+                    background-color: orange;
+                    // border-bottom: 3px solid #eee;
+                    color: white;
+                    font-size: 12pt;
+                    margin: 15px 0 0;
+                    padding: 8px 0;
+                    text-align: center;
+                    text-decoration: none;
+                    text-transform: uppercase;
+                    grid-column: 1 / -1;
+                }
+            }
+        }
     }
 }
 
-
-
+// footer
+footer {
+    background-color: $background-color-footer;
+    color: $text-color-footer;
+    font-size: 8pt;
+    letter-spacing: 1px;
+    padding: 25px;
+    text-align: center;
+    text-transform: uppercase;
+}
 
 // a tags
 a {
-    // color: orange;
+    color: orange;
     text-decoration: none;
     &:hover,
     &:focus {
         color: $hover-a-color;
     }
 }
+
+
+
 
 a img {
     border: none 0px #fff;
@@ -100,15 +167,7 @@ h6 {
     margin: 0 0 20px;
 }
 
-#footer {
-    background-color: #444;
-    color: #aaa;
-    font-size: 8pt;
-    letter-spacing: 1px;
-    padding: 25px;
-    text-align: center;
-    text-transform: uppercase;
-}
+
 
 /* ====================== Navigation ====================== */
 
