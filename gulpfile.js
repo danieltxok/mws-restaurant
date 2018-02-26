@@ -24,7 +24,8 @@ gulp.task('browserSync', function () {
     browserSync.init({
         server: {
             baseDir: 'app'
-        }
+        },
+        browser: "google chrome canary"
     });
 });
 
