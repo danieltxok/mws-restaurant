@@ -117,10 +117,12 @@ main {
                 grid-template-rows: repeat(5, auto);
                 margin: 0;
                 .restaurant-img {
-                    background-color: #ccc;
                     margin: 0;
                     max-width: 100%;
                     grid-column: 1 / -1;
+                    img {
+                        max-width: 100%;
+                    }
                 }
                 h1 {
                     color: $list-title-color;
@@ -135,7 +137,7 @@ main {
                     grid-column-start: 2;
                 }
                 a {
-                    background-color: orange; // border-bottom: 3px solid #eee;
+                    background-color: orange;
                     color: white;
                     font-size: 12pt;
                     margin: 15px 0 0;
