@@ -12,7 +12,7 @@ const htmlmin = require('gulp-htmlmin');
 // const rev = require('gulp-rev');
 // const revdel = require('gulp-rev-delete-original');
 // const collect = require('gulp-rev-collector');
-// const imagemin = require('gulp-imagemin');
+const imagemin = require('gulp-imagemin');
 const cache = require('gulp-cache');
 const del = require('del');
 const runSequence = require('run-sequence');
@@ -97,6 +97,16 @@ gulp.task('minifyHTML', function () {
 //         .pipe(gulp.dest('dist/lib'));
 // });
 
+// Images optimization
+gulp.task('images', function () {
+    return gulp.src('app/img/**/*.+(png|jpg|jpeg|gif|svg)')
+        // Caching images that ran through imagemin
+        .pipe(cache(imagemin({
+            interlaced: true
+        })))
+        .pipe(gulp.dest('dist/img'));
+});
+
 // // Images optimization
 // gulp.task('images', function () {
 //     return gulp.src('app/img/**/*.+(png|jpg|jpeg|gif|svg)')
@@ -154,7 +164,7 @@ gulp.task('build', function (callback) {
             'minifyHTML'
             // 'copyLib'
         ],
-        // 'images',
+        'images',
         // 'ver-append',
         // 'updateHTML',
         callback
