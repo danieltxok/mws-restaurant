@@ -175,6 +175,9 @@ main {
         }
         #restaurant-img {
             width: 100%;
+            img {
+                width: 100%;
+            }
             @include up-600 {
                 grid-row: 2/4;
             }

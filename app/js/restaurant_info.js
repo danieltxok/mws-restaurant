@@ -52,15 +52,26 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   const name = document.getElementById('restaurant-name');
   name.innerHTML = restaurant.name;
 
-  const address = document.getElementById('restaurant-address');
-  address.innerHTML = restaurant.address;
+  const picture = document.getElementById('restaurant-img');
+  picture.className = 'restaurant-img';
 
-  const image = document.getElementById('restaurant-img');
-  image.className = 'restaurant-img'
+  const source = document.createElement('source');
+  source.srcset = DBHelper.imageUrlForRestaurant(restaurant).split('.')[0] + '_w400.jpg 400w, ';
+  source.srcset = source.srcset.concat(DBHelper.imageUrlForRestaurant(restaurant).split('.')[0] + '_w600.jpg 600w, ');
+  source.srcset = source.srcset.concat(DBHelper.imageUrlForRestaurant(restaurant).split('.')[0] + '_w800.jpg 800w');
+  source.sizes = '(max-width: 600px) 90vw, (max-width: 90px) 60vw, (min-width: 901px) 45vw';
+  // source.type = 'image/webp';
+  picture.append(source);
+
+  const image = document.createElement('img');
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  picture.append(image);
 
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
+
+  const address = document.getElementById('restaurant-address');
+  address.innerHTML = restaurant.address;
 
   // fill operating hours
   if (restaurant.operating_hours) {
