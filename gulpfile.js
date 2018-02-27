@@ -17,6 +17,7 @@ const cache = require('gulp-cache');
 const del = require('del');
 const runSequence = require('run-sequence');
 // var gulpIf = require('gulp-if');
+workbox = require('workbox-build');
 
 
 // Start browserSync server
@@ -143,6 +144,39 @@ gulp.task('updateHTML', function () {
 //         .pipe(gulp.dest('dist/fonts'));
 // });
 
+// SW generation
+gulp.task('generate-service-worker-app', () => {
+    return workbox.generateSW({
+        globDirectory: 'app/',
+        globPatterns: ['**\/*.{html,css,js}'],
+        swDest: 'app/sw.js',
+        clientsClaim: true,
+        skipWaiting: true
+    }).then(() => {
+        console.info('Service worker generation completed.');
+    }).catch((error) => {
+        console.warn('Service worker generation failed: ' + error);
+    });
+});
+gulp.task('generate-service-worker-dist', () => {
+    return workbox.generateSW({
+        globDirectory: 'dist/',
+        globPatterns: ['**\/*.{html,css,js}'],
+        swDest: 'dist/sw.js',
+        clientsClaim: true,
+        skipWaiting: true
+    }).then(() => {
+        console.info('Service worker generation completed.');
+    }).catch((error) => {
+        console.warn('Service worker generation failed: ' + error);
+    });
+});
+// // Copy SW files to app
+// gulp.task('copy-service-worker', () => {
+//     return gulp.src('dist/*.{js,map}')
+//         .pipe(gulp.dest('app'));
+// });
+
 // Cleaning up
 gulp.task('clean:all', function () {
     return del.sync('dist').then(function (cb) {
@@ -167,12 +201,13 @@ gulp.task('build', function (callback) {
         'images',
         // 'ver-append',
         // 'updateHTML',
+        'generate-service-worker-dist',
         callback
     );
 });
 // Compiles Sass into CSS while watching HTML and JS files for changes
 gulp.task('default', function (callback) {
-    runSequence(['sass', 'browserSync'], 'watch',
+    runSequence(['sass', 'browserSync'], 'generate-service-worker-app', 'watch',
         callback
     );
 });
