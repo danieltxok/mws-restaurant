@@ -22,17 +22,17 @@
   </header>
 
   <main id="maincontent">
-    <section id="map-container">
-      <div id="map"></div>
+    <section id="map-container" title="Map with restaurant locations">
+      <div id="map" aria-hidden="true"></div>
     </section>
     <section id="restaurant-list-container">
       <div class="filter-options">
         <h2>Filter results:</h2>
-        <label for="neighborhoods-select">Select neighborhood:</label>
+        <label hidden for="neighborhoods-select">Select neighborhood:</label>
         <select id="neighborhoods-select" name="neighborhoods" onchange="updateRestaurants()">
           <option value="all">All Neighborhoods</option>
         </select>
-        <label for="cuisines-select">Select cuisine:</label>
+        <label hidden for="cuisines-select">Select cuisine:</label>
         <select id="cuisines-select" name="cuisines" onchange="updateRestaurants()">
           <option value="all">All Cuisines</option>
         </select>
