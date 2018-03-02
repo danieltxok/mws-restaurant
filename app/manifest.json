@@ -1,0 +1,16 @@
+{
+    "short_name": "RR 3.0",
+    "name": "Restaurant Reviews",
+    "description": "This site contains restaurant reviews",
+    "orientation": "any",
+    "background_color": "transparent",
+    "lang": "eu",
+    "scope": "/",
+    "icons": [
+        {
+            "src": "icon.svg",
+            "type": "image/svg",
+            "sizes": "504x504"
+        }
+    ]
+}
