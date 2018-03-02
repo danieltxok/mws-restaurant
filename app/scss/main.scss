@@ -99,6 +99,13 @@ main {
                 font-size: 12pt;
                 height: 50px;
             }
+            label {
+                position: absolute;
+                left: -10000px;
+                width: 1px;
+                height: 1px;
+                overflow: hidden;
+            }
         }
         #restaurants-list {
             background-color: $background-color-list;
