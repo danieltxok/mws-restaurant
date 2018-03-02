@@ -113,7 +113,7 @@ main {
             margin: 0;
             padding: 5vw 5vw;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             grid-gap: 5vw;
             li {
                 background-color: $background-color;
@@ -237,7 +237,7 @@ main {
             margin: 0;
             padding: 0;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
             grid-gap: 5vw;
             li {
                 background-color: $background-color-breadcrumb;
