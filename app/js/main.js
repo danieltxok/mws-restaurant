@@ -142,13 +142,21 @@ createRestaurantHTML = (restaurant) => {
   picture.className = 'restaurant-img';
   li.append(picture);
 
-  const source = document.createElement('source');
-  source.srcset = DBHelper.imageUrlForRestaurant(restaurant).split('.')[0] + '_w400.jpg 400w, ';
-  source.srcset = source.srcset.concat(DBHelper.imageUrlForRestaurant(restaurant).split('.')[0] + '_w600.jpg 600w, ');
-  source.srcset = source.srcset.concat(DBHelper.imageUrlForRestaurant(restaurant).split('.')[0] + '_w800.jpg 800w');
-  source.sizes = '(max-width: 650px) 90vw, (max-width: 1050px) 45vw, (min-width: 1051px) 27vw';
-  // source.type = 'image/webp';
-  picture.append(source);
+  const source1 = document.createElement('source');
+  source1.srcset = DBHelper.imageUrlForRestaurant(restaurant).split('.')[0] + '_w400.webp 400w, ';
+  source1.srcset = source1.srcset.concat(DBHelper.imageUrlForRestaurant(restaurant).split('.')[0] + '_w600.webp 600w, ');
+  source1.srcset = source1.srcset.concat(DBHelper.imageUrlForRestaurant(restaurant).split('.')[0] + '_w800.webp 800w');
+  source1.sizes = '(max-width: 650px) 90vw, (max-width: 1050px) 45vw, (min-width: 1051px) 27vw';
+  source1.type = 'image/webp';
+  picture.append(source1);
+
+  const source2 = document.createElement('source');
+  source2.srcset = DBHelper.imageUrlForRestaurant(restaurant).split('.')[0] + '_w400.jpg 400w, ';
+  source2.srcset = source2.srcset.concat(DBHelper.imageUrlForRestaurant(restaurant).split('.')[0] + '_w600.jpg 600w, ');
+  source2.srcset = source2.srcset.concat(DBHelper.imageUrlForRestaurant(restaurant).split('.')[0] + '_w800.jpg 800w');
+  source2.sizes = '(max-width: 650px) 90vw, (max-width: 1050px) 45vw, (min-width: 1051px) 27vw';
+  source2.type = 'image/jpg';
+  picture.append(source2);
 
   const image = document.createElement('img');
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
