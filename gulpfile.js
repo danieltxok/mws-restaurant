@@ -201,13 +201,13 @@ gulp.task('build', function (callback) {
         'images',
         // 'ver-append',
         // 'updateHTML',
-        'generate-service-worker-dist',
+        // 'generate-service-worker-dist',
         callback
     );
 });
 // Compiles Sass into CSS while watching HTML and JS files for changes
 gulp.task('default', function (callback) {
-    runSequence(['sass', 'browserSync'], 'generate-service-worker-app', 'watch',
+    runSequence(['sass', 'browserSync'], 'watch',
         callback
     );
 });
