@@ -8,7 +8,7 @@
     "scope": "/",
     "icons": [
         {
-            "src": "icon.svg",
+            "src": "img/icon.svg",
             "type": "image/svg",
             "sizes": "504x504"
         }
