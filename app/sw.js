@@ -1,84 +1,77 @@
 // defines what I want to cache when installing SW
-const cacheName = 'cache-v1';
-const urlsToCache = [
+const staticCacheName = 'rw-static-v1';
+const urlsToStaticCache = [
+    '/',
     '/index.html',
     '/restaurant.html',
+    '/data/restaurants.json',
     '/css/main.css',
     '/js/dbhelper.js',
     '/js/main.js',
     '/js/restaurant_info.js'
 ];
+const contentImgsCache = 'rw-imgs-v1';
+const allCaches = [staticCacheName, contentImgsCache];
 
 // install event
-self.addEventListener('install', function (event) {
-    console.log('The service worker is being installed.');
+self.addEventListener('install', event => {
+    console.log('The service worker is being installed');
     event.waitUntil(
-        caches.open(cacheName)
-            .then(function (cache) {
-                return cache.addAll(urlsToCache);
-            })
-    );
-});
-
-// activate event
-self.addEventListener('activate', function (event) {
-    const cacheWhitelist = [cacheName];
-    event.waitUntil(
-        caches.keys().then(function (keyList) {
-            return Promise.all(keyList.map(function (key) {
-                if (cacheWhitelist.indexOf(key) === -1) {
-                    console.log('Deleting old caches.');
-                    return caches.delete(key);
-                }
-            }));
+        caches.open(staticCacheName).then(cache => {
+            return cache.addAll(urlsToStaticCache);
+            // addAll is atomic and uses fetch under the hood, so the request will always go via the browser cache
         })
     );
 });
 
-// // fetch event
-// self.addEventListener('fetch', function (event) {
-//     console.log('The service worker is serving the asset.' + evt.request.url);
-//     evt.respondWith(fromCache(evt.request).catch(fromServer(evt.request)));
-//     evt.waitUntil(update(evt.request));
-// });
+// activate event
+self.addEventListener('activate', event => {
+    event.waitUntil(
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames.filter(cacheName => {
+                    return cacheName.startsWith('rw-') && !allCaches.includes(cacheName);
+                }).map(cacheName => {
+                    return caches.delete(cacheName);
+                })
+            );
+        })
+    );
+});
 
+// fetch event
+self.addEventListener('fetch', event => {
+    const requestUrl = new URL(event.request.url);
+    if (requestUrl.origin === location.origin) {
+        // console.log(requestUrl);
+        if (requestUrl.pathname.startsWith('/img/')) {
+            event.respondWith(servePhoto(event.request));
+            return;
+        }
+        event.respondWith(
+            caches.match(event.request).then(response => {
+                return response || fetch(event.request);
+            })
+        );
+    }
+    
+    // if (event.request.url.startsWith('http://localhost:3000/img/')) {
+    //     event.respondWith(
+    //         fetch('img/icon.svg')
+    //     );
+    // }
+});
 
+function servePhoto(request) {
+    const storageUrl = request.url.split('_')[0];
+    return caches.open(contentImgsCache).then(cache => {
+        return cache.match(storageUrl).then(response => {
+            if (response) return response;
 
-
-
-
-
-
-
-
-// function precache() {
-//     return caches.open(CACHE).then(function (cache) {
-//         return cache.addAll(precacheFiles);
-//     });
-// }
-
-
-// function fromCache(request) {
-//     //we pull files from the cache first thing so we can show them fast
-//     return caches.open(CACHE).then(function (cache) {
-//         return cache.match(request).then(function (matching) {
-//             return matching || Promise.reject('no-match');
-//         });
-//     });
-// }
-
-
-// function update(request) {
-//     //this is where we call the server to get the newest version of the 
-//     //file to use the next time we show view
-//     return caches.open(CACHE).then(function (cache) {
-//         return fetch(request).then(function (response) {
-//             return cache.put(request, response);
-//         });
-//     });
-// }
-
-// function fromServer(request) {
-//     //this is the fallback if it is not in the cahche to go to the server and get it
-//     return fetch(request).then(function (response) { return response })
-// }
+            return fetch(request).then(networkResponse => {
+                cache.put(storageUrl, networkResponse.clone());
+                return networkResponse;
+            });
+        });
+    });
+}

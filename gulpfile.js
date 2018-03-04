@@ -45,7 +45,7 @@ gulp.task('watch', function () {
     gulp.watch('app/scss/**/*.scss', ['sass']);
     // Reloads the browser whenever HTML or JS files change
     gulp.watch('app/*.html', browserSync.reload);
-    gulp.watch('app/**/*.js', browserSync.reload);
+    gulp.watch('app/js/**/*.js', browserSync.reload);
     // Other watchers
 })
 
@@ -98,7 +98,7 @@ gulp.task('minifyHTML', function () {
 
 // Images optimization
 gulp.task('images', function () {
-    return gulp.src('app/img/**/*.+(png|jpg|jpeg|gif|svg)')
+    return gulp.src('app/img/**/*.+(png|jpg|jpeg|gif|svg|webp)')
         // Caching images that ran through imagemin
         .pipe(cache(imagemin({
             interlaced: true
