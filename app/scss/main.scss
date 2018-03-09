@@ -131,7 +131,7 @@ main {
                         max-width: 100%;
                     }
                 }
-                h1 {
+                h2 {
                     color: $list-title-color;
                     font-weight: 200;
                     margin: 20px 0 10px;
@@ -212,6 +212,12 @@ main {
             @include up-600 {
                 align-self: center;
             }
+            @include up-900 {
+                font-size: 14pt;
+            }
+            @include up-1100 {
+                font-size: 16pt;
+            }
         }
         #restaurant-hours {
             padding: 0 20px;
@@ -220,13 +226,18 @@ main {
             }
             @include up-900 {
                 grid-area: 4/2/5/3;
+                font-size: 10pt;
+            }
+            @include up-1100 {
+                font-size: 12pt;
+                line-height: 1.8em;
             }
         }
     }
     #reviews-container {
         border-top: 1px solid $border-color;
         padding: 5vw 5vw;
-        h2 {
+        h3 {
             color: orange;
             font-size: 20pt;
             font-weight: 300;

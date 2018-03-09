@@ -5,7 +5,7 @@ const autoprefixer = require('gulp-autoprefixer');
 const sourcemaps = require('gulp-sourcemaps');
 const cssnano = require('gulp-cssnano');
 // const eslint = require('gulp-eslint');
-const uglify = require('gulp-uglify');
+// const uglify = require('gulp-uglify');
 // const babel = require('gulp-babel');
 // const babelcore = require('babel-core');
 const htmlmin = require('gulp-htmlmin');
@@ -23,8 +23,8 @@ gulp.task('browserSync', function () {
     browserSync.init({
         server: {
             baseDir: 'app'
-        },
-        browser: "google chrome canary"
+        }
+        //browser: "google chrome canary"
     });
 });
 
