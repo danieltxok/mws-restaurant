@@ -53,17 +53,6 @@
   <script src="js/dbhelper.js"></script>
   <script src="js/main.js"></script>
   <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8tgXBevlK53FB3MP5zLJl_Y2OVjC0Dpo&libraries=places&callback=initMap"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').then(registration => {
-          console.log('SW registered: ', registration);
-        }).catch(registrationError => {
-          console.log('SW registration failed: ', registrationError);
-        });
-      });
-    }
-  </script>
 
 </body>
 

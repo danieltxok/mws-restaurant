@@ -1,5 +1,5 @@
 // defines what I want to cache when installing SW
-const staticCacheName = 'rw-static-v1';
+const staticCacheName = 'rw-static-v2';
 const urlsToStaticCache = [
     '/',
     '/index.html',
@@ -52,18 +52,18 @@ self.addEventListener('activate', event => {
 // fetch event
 self.addEventListener('fetch', event => {
     const requestUrl = new URL(event.request.url);
-    if (requestUrl.origin === location.origin) {
+    // if (requestUrl.origin === location.origin) {
         // console.log(requestUrl);
-        // if (requestUrl.pathname.startsWith('/img/')) {
-        //     event.respondWith(servePhoto(event.request));
-        //     return;
-        // }
+        if (requestUrl.pathname.startsWith('/img/')) {
+            event.respondWith(servePhoto(event.request));
+            return;
+        }
         event.respondWith(
             caches.match(event.request).then(response => {
                 return response || fetch(event.request);
             })
         );
-    }
+    // }
     
     // if (event.request.url.startsWith('http://localhost:3000/img/')) {
     //     event.respondWith(
