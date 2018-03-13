@@ -1,21 +1,4 @@
 const gulp = require('gulp');
-const sass = require('gulp-sass');
-const browserSync = require('browser-sync').create();
-const autoprefixer = require('gulp-autoprefixer');
-const sourcemaps = require('gulp-sourcemaps');
-const cssnano = require('gulp-cssnano');
-// const eslint = require('gulp-eslint');
-// const uglify = require('gulp-uglify');
-// const babel = require('gulp-babel');
-// const babelcore = require('babel-core');
-const htmlmin = require('gulp-htmlmin');
-// const rev = require('gulp-rev');
-// const revdel = require('gulp-rev-delete-original');
-// const collect = require('gulp-rev-collector');
-const imagemin = require('gulp-imagemin');
-const cache = require('gulp-cache');
-const del = require('del');
-const runSequence = require('run-sequence');
 
 
 // Start browserSync server
@@ -28,7 +11,11 @@ gulp.task('browserSync', function () {
     });
 });
 
+
 // SASS task for CSS
+const sass = require('gulp-sass');
+const browserSync = require('browser-sync').create();
+const autoprefixer = require('gulp-autoprefixer');
 gulp.task('sass', function () {
     return gulp.src('app/scss/**/*.scss') // Gets all files ending with .scss in app/scss and children dirs
         .pipe(sass().on('error', sass.logError)) // Passes it through a gulp-sass, log errors to console
@@ -39,6 +26,7 @@ gulp.task('sass', function () {
         .pipe(browserSync.stream()); // browserSync.stream for CSS
 });
 
+
 // Watchers
 gulp.task('watch', function () {
     // Runs sass task whenever SCSS files change
@@ -46,11 +34,14 @@ gulp.task('watch', function () {
     // Reloads the browser whenever HTML or JS files change
     gulp.watch('app/*.html', browserSync.reload);
     gulp.watch('app/**/*.js', browserSync.reload);
-    // Other watchers
+    // Other watchers if necessary
 })
+
 
 // CSS Minification + Sourcemap
 // If concatenation needed, add it before minification
+const sourcemaps = require('gulp-sourcemaps');
+const cssnano = require('gulp-cssnano');
 gulp.task('minifyCSS', function () {
     return gulp.src('app/css/**/*.css')
         .pipe(sourcemaps.init())
@@ -59,8 +50,10 @@ gulp.task('minifyCSS', function () {
         .pipe(gulp.dest('dist/css'));
 });
 
+
 // // ESlint task
 // // Create configuration file: ./node_modules/.bin/eslint --init
+// const eslint = require('gulp-eslint');
 // gulp.task('lint', function () {
 //     return gulp.src('app/js/**/*.js')
 //         .pipe(eslint())
@@ -68,81 +61,79 @@ gulp.task('minifyCSS', function () {
 //         .pipe(eslint.failAfterError());
 // });
 
+
 // JS Minification + Sourcemap
 // If concatenation needed, add it before minification
+// const babel = require('gulp-babel');
+// const babelcore = require('babel-core');
+// const uglify = require('gulp-uglify');
+const uglify = require('gulp-uglify-es').default;
 gulp.task('minifyJS', function () {
-    return gulp.src('app/**/*.js')
+    return gulp.src('app/js/**/*.js')
         .pipe(sourcemaps.init())
         // .pipe(babel({
         //     presets: ['env']
         // }))
         // .pipe(uglify().on('error', e => console.log(e)))
+        // .pipe(uglify())
         .pipe(sourcemaps.write())
         .pipe(gulp.dest('dist/js'));
 });
 
+
 // HTML Minification
+const htmlmin = require('gulp-htmlmin');
 gulp.task('minifyHTML', function () {
     return gulp.src('app/*.html')
-        .pipe(htmlmin({
-            collapseWhitespace: true
-        }))
+        // .pipe(htmlmin({
+        //     collapseWhitespace: true
+        // }))
         .pipe(gulp.dest('dist'));
 });
 
-// // Copying libraries to dist
-// gulp.task('copyLib', function () {
-//     return gulp.src('app/lib/**/*')
-//         .pipe(gulp.dest('dist/lib'));
-// });
 
-// Images optimization
+// Images copying
 gulp.task('images', function () {
     return gulp.src('app/img/**/*.+(png|jpg|jpeg|gif|svg|webp)')
-        // Caching images that ran through imagemin
-        .pipe(cache(imagemin({
-            interlaced: true
-        })))
         .pipe(gulp.dest('dist/img'));
 });
 
-// // Images optimization
-// gulp.task('images', function () {
-//     return gulp.src('app/img/**/*.+(png|jpg|jpeg|gif|svg)')
-//         // Caching images that ran through imagemin
-//         .pipe(cache(imagemin({
-//             interlaced: true
-//         })))
-//         .pipe(gulp.dest('dist/img'));
-// });
+
+// Manifest copying
+gulp.task('service-worker', function () {
+    return gulp.src('app/*.+(json|js)')
+        .pipe(gulp.dest('dist'));
+});
+
 
 // Rename static minified files
+const rev = require('gulp-rev');
+const revdel = require('gulp-rev-delete-original');
 gulp.task('ver-append', function () {
     return gulp.src(['dist/**/*.html',
             'dist/**/*.css',
-            'dist/**/*.js',
-            'dist/**/*.{png,jpg,jpeg,gif,svg}'
+            'dist/**/*.js'
         ])
         .pipe(rev())
         .pipe(revdel())
         .pipe(gulp.dest('dist'))
-        .pipe(rev.manifest('manifest.json'))
+        .pipe(rev.manifest('manifest-ver-append.json'))
         .pipe(gulp.dest('dist'));
 });
+
+
 // Rename them inside the files (update references)
+const collect = require('gulp-rev-collector');
 gulp.task('updateHTML', function () {
-    return gulp.src(['dist/manifest.json', 'dist/**/*.{html, json, css, js}'])
+    return gulp.src(['dist/manifest-ver-append.json', 'dist/**/*.{html, json, css, js}'])
+    // return gulp.src(['dist/manifest-ver-append.json', 'dist/sw.js}'])
         .pipe(collect())
         .pipe(gulp.dest('dist'));
 });
 
-// // Copying fonts to dist
-// gulp.task('fonts', function () {
-//     return gulp.src('app/fonts/**/*')
-//         .pipe(gulp.dest('dist/fonts'));
-// });
 
 // Cleaning up
+const del = require('del');
 gulp.task('clean:all', function () {
     return del.sync('dist').then(function (cb) {
         return cache.clearAll(cb);
@@ -152,8 +143,10 @@ gulp.task('clean:dist', function () {
     return del.sync(['dist/**/*', '!dist/images', '!dist/images/**/*']);
 });
 
+
 // Combining all gulp tasks
 // Creates a dist folder for the production site
+const runSequence = require('run-sequence');
 gulp.task('build', function (callback) {
     runSequence(
         'clean:dist',
@@ -161,20 +154,23 @@ gulp.task('build', function (callback) {
         ['minifyCSS',
             'minifyJS',
             'minifyHTML'
-            // 'copyLib'
         ],
         'images',
-        // 'ver-append',
-        // 'updateHTML',
+        'service-worker',
+        'ver-append',
+        'updateHTML',
         callback
     );
 });
+
+
 // Compiles Sass into CSS while watching HTML and JS files for changes
 gulp.task('default', function (callback) {
     runSequence(['sass', 'browserSync'], 'watch',
         callback
     );
 });
+
 
 // Resources
 // https://css-tricks.com/gulp-for-beginners/
