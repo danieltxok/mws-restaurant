@@ -53,13 +53,13 @@ gulp.task('minifyCSS', function () {
 
 // // ESlint task
 // // Create configuration file: ./node_modules/.bin/eslint --init
-// const eslint = require('gulp-eslint');
-// gulp.task('lint', function () {
-//     return gulp.src('app/js/**/*.js')
-//         .pipe(eslint())
-//         .pipe(eslint.format())
-//         .pipe(eslint.failAfterError());
-// });
+const eslint = require('gulp-eslint');
+gulp.task('lint', function () {
+    return gulp.src('app/**/*.js')
+        .pipe(eslint())
+        .pipe(eslint.format())
+        .pipe(eslint.failAfterError());
+});
 
 
 // JS Minification + Sourcemap
@@ -157,8 +157,8 @@ gulp.task('build', function (callback) {
         ],
         'images',
         'service-worker',
-        'ver-append',
-        'updateHTML',
+        // 'ver-append',
+        // 'updateHTML',
         callback
     );
 });
