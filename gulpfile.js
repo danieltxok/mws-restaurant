@@ -1,3 +1,4 @@
+/* global require */
 const gulp = require('gulp');
 
 
@@ -74,8 +75,7 @@ gulp.task('minifyJS', function () {
         // .pipe(babel({
         //     presets: ['env']
         // }))
-        // .pipe(uglify().on('error', e => console.log(e)))
-        // .pipe(uglify())
+        .pipe(uglify())
         .pipe(sourcemaps.write())
         .pipe(gulp.dest('dist/js'));
 });
@@ -85,9 +85,9 @@ gulp.task('minifyJS', function () {
 const htmlmin = require('gulp-htmlmin');
 gulp.task('minifyHTML', function () {
     return gulp.src('app/*.html')
-        // .pipe(htmlmin({
-        //     collapseWhitespace: true
-        // }))
+        .pipe(htmlmin({
+            collapseWhitespace: true
+        }))
         .pipe(gulp.dest('dist'));
 });
 
@@ -133,6 +133,7 @@ gulp.task('updateHTML', function () {
 
 
 // Cleaning up
+const cache = require('gulp-cache');
 const del = require('del');
 gulp.task('clean:all', function () {
     return del.sync('dist').then(function (cb) {
@@ -151,6 +152,7 @@ gulp.task('build', function (callback) {
     runSequence(
         'clean:dist',
         'sass',
+        // 'lint',
         ['minifyCSS',
             'minifyJS',
             'minifyHTML'
