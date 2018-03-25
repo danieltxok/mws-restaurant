@@ -5,7 +5,7 @@ const urlsToStaticCache = [
     '/',
     '/index.html',
     '/restaurant.html',
-    '/data/restaurants.json',
+    // '/data/restaurants.json',
     '/css/main.css',
     '/js/dbhelper.js',
     '/js/main.js',

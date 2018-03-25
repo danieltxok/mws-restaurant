@@ -10,6 +10,8 @@ var markers = []
 document.addEventListener('DOMContentLoaded', (event) => {
   fetchNeighborhoods();
   fetchCuisines();
+  // Moved up here in case the request of the map fails, this still runs
+  updateRestaurants();
 });
 
 /**
@@ -68,7 +70,7 @@ fillCuisinesHTML = (cuisines = self.cuisines) => {
 }
 
 /**
- * Initialize Google map, called from HTML.
+ * Initialize Google map, called from HTML when requesting the Maps script.
  */
 window.initMap = () => {
   let loc = {
@@ -80,7 +82,7 @@ window.initMap = () => {
     center: loc,
     scrollwheel: false
   });
-  updateRestaurants();
+  // updateRestaurants();
 }
 
 /**
