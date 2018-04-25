@@ -17,15 +17,72 @@ class DBHelper {
    */
   static fetchRestaurants(callback) {
     fetch(DBHelper.DATABASE_URL)
-      .then(respond => {
-        if (!respond.ok) {
-          throw "Unable to fetch data from server.";
-        }
-        // parse the respond text as json and return it
-        return respond.json();
-      })
+      .then(response => response.json())
+      .then(restaurants => DBHelper.insertRestaurantsToDB(restaurants))
       .then(restaurants => callback(null, restaurants))
-      .catch(e => callback(e, null))
+      .catch(err => {
+        // Fetch from indexdb incase network is not available
+        DBHelper.fetchRestaurantsFromClient().then(restaurants => {
+          callback(null, restaurants)
+        })
+        console.log('testindg');
+      });
+  }
+
+  /**
+   * Insert restaurants to DB.
+   */
+  static insertRestaurantsToDB(restaurants) {
+    const DB_NAME = 'udacity-restaurants';
+    const DB_VERSION = 1;
+    const DB_STORE_NAME = 'restaurants';
+
+    const req = window.indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = function (e) { //onupgradeneeded is the only place where you can alter the structure of the database
+      var db = e.target.result;
+      var objectStore = db.createObjectStore(DB_STORE_NAME, {
+        keyPath: "id"
+      });
+      // objectStore.createIndex("neighborhood", "neighborhood", {
+      //   unique: false
+      // });
+      // objectStore.createIndex("cuisine_type", "cuisine_type", {
+      //   unique: false
+      // });
+      objectStore.transaction.oncomplete = function (e) {
+        // Store values in the newly created objectStore.
+        var restaurantsObjectStore = db.transaction(DB_STORE_NAME, "readwrite").objectStore(DB_STORE_NAME);
+        restaurants.forEach(function (restaurant) {
+          restaurantsObjectStore.add(restaurant);
+        });
+      };
+    };
+    req.onerror = function (e) {
+      console.log(e);
+    };
+    return restaurants;
+  }
+
+  /**
+   * Get restaurants from DB.
+   */
+  static fetchRestaurantsFromClient() {
+    const DB_NAME = 'udacity-restaurants';
+    const DB_VERSION = 1;
+    const DB_STORE_NAME = 'restaurants';
+
+    const req = window.indexedDB.open(DB_NAME, DB_VERSION);
+    req.onsuccess = function (e) {
+      var db = e.target.result;
+      var restaurantsObjectStore = db.transaction(DB_STORE_NAME, "readwrite").objectStore(DB_STORE_NAME);
+      var restaurantsObjectStoreRequest = restaurantsObjectStore.get("id");
+      // debugger;
+      restaurantsObjectStoreRequest.onsuccess = function (event) {
+        var mzRecord = restaurantsObjectStoreRequest.result;
+        // debugger;
+        return mzRecord;
+      }
+    };
   }
 
   /**
