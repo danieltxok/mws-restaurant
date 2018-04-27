@@ -99,9 +99,9 @@ gulp.task('images', function () {
 });
 
 
-// Manifest copying
+// Copy manifest, SW and the rest
 gulp.task('service-worker', function () {
-    return gulp.src('app/*.+(json|js)')
+    return gulp.src(['app/*.+(json|js)', 'app/_redirects'])
         .pipe(gulp.dest('dist'));
 });
 
