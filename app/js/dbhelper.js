@@ -71,16 +71,19 @@ class DBHelper {
     const DB_VERSION = 1;
     const DB_STORE_NAME = 'restaurants';
 
+    // const restaurnats = [];
+
     const req = window.indexedDB.open(DB_NAME, DB_VERSION);
     req.onsuccess = function (e) {
       var db = e.target.result;
       var restaurantsObjectStore = db.transaction(DB_STORE_NAME, "readwrite").objectStore(DB_STORE_NAME);
-      var restaurantsObjectStoreRequest = restaurantsObjectStore.get("id");
+      //var restaurantsObjectStoreRequest = restaurantsObjectStore.get("id");
+      var restaurantsObjectStoreRequest = restaurantsObjectStore.getAll();
       // debugger;
       restaurantsObjectStoreRequest.onsuccess = function (event) {
-        var mzRecord = restaurantsObjectStoreRequest.result;
+        // var mzRecord = restaurantsObjectStoreRequest.result;
         // debugger;
-        return mzRecord;
+        return restaurantsObjectStoreRequest.result;
       }
     };
   }
