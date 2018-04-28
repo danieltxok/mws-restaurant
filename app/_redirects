@@ -1,1 +1,12 @@
-http://mws-dbarcosb-restaurants.netlify.com/*            https://mws-dbarcosb-restaurants.netlify.com/:splat 301!
+http://mws-dbarcosb-restaurants.netlify.com/            https://mws-dbarcosb-restaurants.netlify.com/
+http://mws-dbarcosb-restaurants.netlify.com/restaurant.html?id=1            https://mws-dbarcosb-restaurants.netlify.com/restaurant.html?id=1
+http://mws-dbarcosb-restaurants.netlify.com/restaurant.html?id=2            https://mws-dbarcosb-restaurants.netlify.com/restaurant.html?id=2
+http://mws-dbarcosb-restaurants.netlify.com/restaurant.html?id=3            https://mws-dbarcosb-restaurants.netlify.com/restaurant.html?id=3
+http://mws-dbarcosb-restaurants.netlify.com/restaurant.html?id=4            https://mws-dbarcosb-restaurants.netlify.com/restaurant.html?id=4
+http://mws-dbarcosb-restaurants.netlify.com/restaurant.html?id=5            https://mws-dbarcosb-restaurants.netlify.com/restaurant.html?id=5
+http://mws-dbarcosb-restaurants.netlify.com/restaurant.html?id=6            https://mws-dbarcosb-restaurants.netlify.com/restaurant.html?id=6
+http://mws-dbarcosb-restaurants.netlify.com/restaurant.html?id=7            https://mws-dbarcosb-restaurants.netlify.com/restaurant.html?id=7
+http://mws-dbarcosb-restaurants.netlify.com/restaurant.html?id=8            https://mws-dbarcosb-restaurants.netlify.com/restaurant.html?id=8
+http://mws-dbarcosb-restaurants.netlify.com/restaurant.html?id=9            https://mws-dbarcosb-restaurants.netlify.com/restaurant.html?id=9
+http://mws-dbarcosb-restaurants.netlify.com/restaurant.html?id=10            https://mws-dbarcosb-restaurants.netlify.com/restaurant.html?id=10
+http://mws-dbarcosb-restaurants.netlify.com/restaurant.html?id=11            https://mws-dbarcosb-restaurants.netlify.com/restaurant.html?id=11
