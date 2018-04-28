@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
   fetchCuisines();
   // Moved up here in case the request of the map fails, this still runs
   updateRestaurants();
+  registerSW();
 });
 
 /**
@@ -198,4 +199,16 @@ addMarkersToMap = (restaurants = self.restaurants) => {
     });
     self.markers.push(marker);
   });
+}
+
+/**
+ * SW Registration script.
+ */
+registerSW = () => {
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').then(registration => console.log('SW registered: ', registration.scope))
+        .catch(e => console.log('SW registration failed: ', e));
+    })
+  }
 }

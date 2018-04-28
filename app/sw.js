@@ -71,18 +71,19 @@ self.addEventListener('fetch', event => {
 
             // If response in cache, return cached version
             // If response not in cache, fetch & cache
-            return response || fetch(event.request).then(response => {
+            return response || fetch(event.request);
+            // return response || fetch(event.request).then(response => {
 
-                // Open the cache
-                caches.open(responsesCache).then(cache => {
+            //     // Open the cache
+            //     caches.open(responsesCache).then(cache => {
 
-                    // Put the request/response(cloned) in the cache
-                    cache.put(event.request, response.clone());
+            //         // Put the request/response(cloned) in the cache
+            //         cache.put(event.request, response.clone());
 
-                    // return response
-                    return response;
-                });
-            });
+            //         // return response
+            //         return response;
+            //     });
+            // });
         })
     );
 });

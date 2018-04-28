@@ -16,76 +16,88 @@ class DBHelper {
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
+    // fetch restaurants
     fetch(DBHelper.DATABASE_URL)
+
+      // if successful, parse the JSON
       .then(response => response.json())
-      .then(restaurants => DBHelper.insertRestaurantsToDB(restaurants))
-      .then(restaurants => callback(null, restaurants))
-      .catch(err => {
-        // Fetch from indexdb incase network is not available
-        DBHelper.fetchRestaurantsFromClient().then(restaurants => {
-          callback(null, restaurants)
-        })
-        console.log('testindg');
+
+      // then cache the restaurants
+      .then(restaurants => {
+        DBHelper.insertToIDB(restaurants);
+        callback(null, restaurants);
+      })
+
+      // Fetch from indexdb in case network is not available
+      .catch(e => {
+        console.error('Fetch from network failed!: ' + e);
+        console.log('Getting from IndexedDB...');
+        DBHelper.getFromIDB((e, restaurants) => callback(null, restaurants));
       });
   }
 
   /**
    * Insert restaurants to DB.
    */
-  static insertRestaurantsToDB(restaurants) {
+  static insertToIDB(restaurants) {
     const DB_NAME = 'udacity-restaurants';
     const DB_VERSION = 1;
     const DB_STORE_NAME = 'restaurants';
 
-    const req = window.indexedDB.open(DB_NAME, DB_VERSION);
-    req.onupgradeneeded = function (e) { //onupgradeneeded is the only place where you can alter the structure of the database
-      var db = e.target.result;
-      var objectStore = db.createObjectStore(DB_STORE_NAME, {
-        keyPath: "id"
+    // Get correct IDB for all browsers
+    const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+
+    // Let us open our database
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+
+    // onupgradeneeded is the only place where you can alter the structure of the database
+    // it is triggered when a database of a bigger version number than the existing stored database is loaded
+    // or when there is no previous database
+    // we execute it before onsucess to create the store
+    req.onupgradeneeded = () => { 
+      const db = req.result;
+      const store = db.createObjectStore(DB_STORE_NAME, {keyPath: "id"});
+    };
+
+    // if success
+    req.onsuccess = () => {
+      // Start with a transaction to store values in the previously created objectStore.
+      const db = req.result;
+      const store = db.transaction(DB_STORE_NAME, "readwrite").objectStore(DB_STORE_NAME);
+
+      // Store data
+      restaurants.forEach(restaurant => {
+        store.put(restaurant);
       });
-      // objectStore.createIndex("neighborhood", "neighborhood", {
-      //   unique: false
-      // });
-      // objectStore.createIndex("cuisine_type", "cuisine_type", {
-      //   unique: false
-      // });
-      objectStore.transaction.oncomplete = function (e) {
-        // Store values in the newly created objectStore.
-        var restaurantsObjectStore = db.transaction(DB_STORE_NAME, "readwrite").objectStore(DB_STORE_NAME);
-        restaurants.forEach(function (restaurant) {
-          restaurantsObjectStore.add(restaurant);
-        });
-      };
-    };
-    req.onerror = function (e) {
-      console.log(e);
-    };
-    return restaurants;
+    }
+
+    // if error
+    req.onerror = e => console.error('IDB error: ' + e);
   }
 
   /**
-   * Get restaurants from DB.
+   * Get restaurants from IndexedDB.
    */
-  static fetchRestaurantsFromClient() {
+  static getFromIDB(callback) {
     const DB_NAME = 'udacity-restaurants';
     const DB_VERSION = 1;
     const DB_STORE_NAME = 'restaurants';
 
-    // const restaurnats = [];
+    // Get correct IDB for all browsers
+    const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
 
-    const req = window.indexedDB.open(DB_NAME, DB_VERSION);
-    req.onsuccess = function (e) {
-      var db = e.target.result;
-      var restaurantsObjectStore = db.transaction(DB_STORE_NAME, "readwrite").objectStore(DB_STORE_NAME);
-      //var restaurantsObjectStoreRequest = restaurantsObjectStore.get("id");
-      var restaurantsObjectStoreRequest = restaurantsObjectStore.getAll();
-      // debugger;
-      restaurantsObjectStoreRequest.onsuccess = function (event) {
-        // var mzRecord = restaurantsObjectStoreRequest.result;
-        // debugger;
-        return restaurantsObjectStoreRequest.result;
-      }
-    };
+    // Let us open our database
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+
+    // if success
+    req.onsuccess = () => {
+      // Start with a new transaction to read values
+      const db = req.result;
+      const store = db.transaction(DB_STORE_NAME, "readwrite").objectStore(DB_STORE_NAME);
+      const getData = store.getAll();
+
+      getData.onsuccess = () => callback(null, getData.result);
+    }
   }
 
   /**
@@ -224,17 +236,4 @@ class DBHelper {
     return marker;
   }
 
-}
-
-// /**
-// * SW Registration script.
-// */
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('../sw.js').then(registration => {
-      console.log('SW registered: ', registration);
-    }).catch(registrationError => {
-      console.log('SW registration failed: ', registrationError);
-    });
-  });
 }
