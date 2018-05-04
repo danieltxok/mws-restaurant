@@ -12,6 +12,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
   fetchCuisines();
   // Moved up here in case the request of the map fails, this still runs
   updateRestaurants();
+});
+
+/**
+ * Load secondary stuff after fully load.
+ */
+window.addEventListener('load', (event) => {
+  lazyLoad();
   registerSW();
 });
 
@@ -141,30 +148,35 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
 createRestaurantHTML = (restaurant) => {
   const li = document.createElement('li');
 
-  const picture = document.createElement('picture');
-  picture.className = 'restaurant-img';
-  li.append(picture);
+  // const picture = document.createElement('picture');
+  // picture.className = 'restaurant-img';
+  // li.append(picture);
 
-  const source1 = document.createElement('source');
-  source1.srcset = DBHelper.imageUrlForRestaurant(restaurant).split('.')[0] + '_w400.webp 400w, ';
-  source1.srcset = source1.srcset.concat(DBHelper.imageUrlForRestaurant(restaurant).split('.')[0] + '_w600.webp 600w, ');
-  source1.srcset = source1.srcset.concat(DBHelper.imageUrlForRestaurant(restaurant).split('.')[0] + '_w800.webp 800w');
-  source1.sizes = '(max-width: 650px) 90vw, (max-width: 1050px) 45vw, (min-width: 1051px) 27vw';
-  source1.type = 'image/webp';
-  picture.append(source1);
+  // const source1 = document.createElement('source');
+  // source1.srcset = DBHelper.imageUrlForRestaurant(restaurant).split('.')[0] + '_w400.webp 400w, ';
+  // source1.srcset = source1.srcset.concat(DBHelper.imageUrlForRestaurant(restaurant).split('.')[0] + '_w600.webp 600w, ');
+  // source1.srcset = source1.srcset.concat(DBHelper.imageUrlForRestaurant(restaurant).split('.')[0] + '_w800.webp 800w');
+  // source1.sizes = '(max-width: 650px) 90vw, (max-width: 1050px) 45vw, (min-width: 1051px) 27vw';
+  // source1.type = 'image/webp';
+  // picture.append(source1);
 
-  const source2 = document.createElement('source');
-  source2.srcset = DBHelper.imageUrlForRestaurant(restaurant).split('.')[0] + '_w400.jpg 400w, ';
-  source2.srcset = source2.srcset.concat(DBHelper.imageUrlForRestaurant(restaurant).split('.')[0] + '_w600.jpg 600w, ');
-  source2.srcset = source2.srcset.concat(DBHelper.imageUrlForRestaurant(restaurant).split('.')[0] + '_w800.jpg 800w');
-  source2.sizes = '(max-width: 650px) 90vw, (max-width: 1050px) 45vw, (min-width: 1051px) 27vw';
-  source2.type = 'image/jpg';
-  picture.append(source2);
+  // const source2 = document.createElement('source');
+  // source2.srcset = DBHelper.imageUrlForRestaurant(restaurant).split('.')[0] + '_w400.jpg 400w, ';
+  // source2.srcset = source2.srcset.concat(DBHelper.imageUrlForRestaurant(restaurant).split('.')[0] + '_w600.jpg 600w, ');
+  // source2.srcset = source2.srcset.concat(DBHelper.imageUrlForRestaurant(restaurant).split('.')[0] + '_w800.jpg 800w');
+  // source2.sizes = '(max-width: 650px) 90vw, (max-width: 1050px) 45vw, (min-width: 1051px) 27vw';
+  // source2.type = 'image/jpg';
+  // picture.append(source2);
 
   const image = document.createElement('img');
-  image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.className = 'restaurant-img lazy';
+  image.src = DBHelper.imageUrlForRestaurant(restaurant) + '_sqip.svg';
+  image.setAttribute('data-src', DBHelper.imageUrlForRestaurant(restaurant) + '.jpg');
+  const responsiveness = DBHelper.imageUrlForRestaurant(restaurant) + '_w400.webp 400w, ' + DBHelper.imageUrlForRestaurant(restaurant) + '_w600.webp 600w, ' + DBHelper.imageUrlForRestaurant(restaurant) + '_w800.webp 800w';
+  image.setAttribute('data-srcset', responsiveness);
   image.alt = restaurant.name + ' restaurant';
-  picture.append(image);
+  li.append(image);
+  // picture.append(image);
 
   const name = document.createElement('h2');
   name.innerHTML = restaurant.name;
@@ -210,5 +222,31 @@ registerSW = () => {
       navigator.serviceWorker.register('sw.js').then(registration => console.log('SW registered: ', registration.scope))
         .catch(e => console.log('SW registration failed: ', e));
     })
+  }
+}
+
+/**
+ * Lazy Loading with Intersection Observer.
+ */
+lazyLoad = () => {
+  const lazyImages = [].slice.call(document.querySelectorAll("img.lazy"));
+  if ("IntersectionObserver" in window) {
+    let lazyImageObserver = new IntersectionObserver(function (entries, observer) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          let lazyImage = entry.target;
+          lazyImage.src = lazyImage.dataset.src;
+          lazyImage.srcset = lazyImage.dataset.srcset;
+          lazyImage.classList.remove("lazy");
+          lazyImageObserver.unobserve(lazyImage);
+        }
+      });
+    });
+
+    lazyImages.forEach(function (lazyImage) {
+      lazyImageObserver.observe(lazyImage);
+    });
+  } else {
+    // Possibly fall back to a more compatible method here
   }
 }

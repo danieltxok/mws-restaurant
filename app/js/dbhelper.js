@@ -93,7 +93,8 @@ class DBHelper {
     req.onsuccess = () => {
       // Start with a new transaction to read values
       const db = req.result;
-      const store = db.transaction(DB_STORE_NAME, "readwrite").objectStore(DB_STORE_NAME);
+      const transac = db.transaction(DB_STORE_NAME, "readwrite");
+      const store = transac.objectStore(DB_STORE_NAME);
       const getData = store.getAll();
 
       getData.onsuccess = () => callback(null, getData.result);
