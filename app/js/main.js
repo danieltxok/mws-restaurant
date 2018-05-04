@@ -12,14 +12,15 @@ document.addEventListener('DOMContentLoaded', (event) => {
   fetchCuisines();
   // Moved up here in case the request of the map fails, this still runs
   updateRestaurants(true);
+  registerSW();
 });
 
 /**
  * Load secondary stuff after fully load.
  */
 window.addEventListener('load', (event) => {
+  swapMap();
   lazyLoad();
-  registerSW();
 });
 
 /**
@@ -86,7 +87,7 @@ window.initMap = () => {
     lng: -73.987501
   };
   self.map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 12,
+    zoom: 11.5,
     center: loc,
     scrollwheel: false
   });
@@ -301,4 +302,14 @@ lazyLoad = () => {
   } else {
     // Possibly fall back to a more compatible method here
   }
+}
+
+/**
+ * Swap map placeholder.
+ */
+swapMap = () => {
+  const placeholder = document.getElementById('map-placeholder');
+  const map = document.getElementById('map');
+  placeholder.style.display = 'none';
+  map.style.display = 'block';
 }

@@ -69,8 +69,23 @@ header {
 main {
     #map-container {
         #map {
-            height: 400px;
+            height: 332px;
             width: 100%;
+            display: none;
+            @include up-600 {
+                height: 400px;
+                width: 100%;
+                display: block;
+            }
+        }
+        #map-placeholder {
+            // height: 332px;
+            width: 100%;
+            @include up-600 {
+                height: 400px;
+                width: 100%;
+                display: none;
+            }
         }
     }
     #restaurant-list-container {
