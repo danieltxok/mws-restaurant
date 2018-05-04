@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
   fetchNeighborhoods();
   fetchCuisines();
   // Moved up here in case the request of the map fails, this still runs
-  updateRestaurants();
+  updateRestaurants(true);
 });
 
 /**
@@ -96,7 +96,7 @@ window.initMap = () => {
 /**
  * Update page and map for current restaurants.
  */
-updateRestaurants = () => {
+updateRestaurants = (lazy) => {
   const cSelect = document.getElementById('cuisines-select');
   const nSelect = document.getElementById('neighborhoods-select');
 
@@ -111,7 +111,11 @@ updateRestaurants = () => {
       console.error(error);
     } else {
       resetRestaurants(restaurants);
-      fillRestaurantsHTML();
+      if (lazy) {
+        fillRestaurantsHTML();
+      } else {
+        fillRestaurantsHTMLwithoutLL();
+      }
     }
   })
 }
@@ -132,7 +136,7 @@ resetRestaurants = (restaurants) => {
 }
 
 /**
- * Create all restaurants HTML and add them to the webpage.
+ * Create all restaurants HTML and add them to the webpage with lazy loading.
  */
 fillRestaurantsHTML = (restaurants = self.restaurants) => {
   const ul = document.getElementById('restaurants-list');
@@ -143,7 +147,18 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
 }
 
 /**
- * Create restaurant HTML.
+ * Create all restaurants HTML and add them to the webpage without lazy loading.
+ */
+fillRestaurantsHTMLwithoutLL = (restaurants = self.restaurants) => {
+  const ul = document.getElementById('restaurants-list');
+  restaurants.forEach(restaurant => {
+    ul.append(createRestaurantHTMLwithoutLL(restaurant));
+  });
+  addMarkersToMap();
+}
+
+/**
+ * Create restaurant HTML (with Lazy Loading).
  */
 createRestaurantHTML = (restaurant) => {
   const li = document.createElement('li');
@@ -172,6 +187,43 @@ createRestaurantHTML = (restaurant) => {
   image.className = 'restaurant-img lazy';
   image.src = DBHelper.imageUrlForRestaurant(restaurant) + '_sqip.svg';
   image.setAttribute('data-src', DBHelper.imageUrlForRestaurant(restaurant) + '.jpg');
+  const responsiveness = DBHelper.imageUrlForRestaurant(restaurant) + '_w400.webp 400w, ' + DBHelper.imageUrlForRestaurant(restaurant) + '_w600.webp 600w, ' + DBHelper.imageUrlForRestaurant(restaurant) + '_w800.webp 800w';
+  image.setAttribute('data-srcset', responsiveness);
+  image.alt = restaurant.name + ' restaurant';
+  li.append(image);
+  // picture.append(image);
+
+  const name = document.createElement('h2');
+  name.innerHTML = restaurant.name;
+  li.append(name);
+
+  const neighborhood = document.createElement('p');
+  neighborhood.innerHTML = restaurant.neighborhood;
+  li.append(neighborhood);
+
+  const address = document.createElement('p');
+  address.innerHTML = restaurant.address;
+  li.append(address);
+
+  const more = document.createElement('a');
+  more.innerHTML = 'View Details';
+  more.href = DBHelper.urlForRestaurant(restaurant);
+  more.title = restaurant.name + ' restaurant';
+  li.append(more)
+
+  return li
+}
+
+/**
+ * Create restaurant HTML without lazyloading.
+ */
+createRestaurantHTMLwithoutLL = (restaurant) => {
+  const li = document.createElement('li');
+
+  const image = document.createElement('img');
+  image.className = 'restaurant-img';
+  image.src = DBHelper.imageUrlForRestaurant(restaurant) + '.jpg';
+  // image.setAttribute('data-src', DBHelper.imageUrlForRestaurant(restaurant) + '.jpg');
   const responsiveness = DBHelper.imageUrlForRestaurant(restaurant) + '_w400.webp 400w, ' + DBHelper.imageUrlForRestaurant(restaurant) + '_w600.webp 600w, ' + DBHelper.imageUrlForRestaurant(restaurant) + '_w800.webp 800w';
   image.setAttribute('data-srcset', responsiveness);
   image.alt = restaurant.name + ' restaurant';
