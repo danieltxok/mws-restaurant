@@ -41,6 +41,22 @@
     </section>
     <section id="reviews-container">
       <ul id="reviews-list"></ul>
+
+    </section>
+    <section id="restaurant-reviews-form">
+      <form id="review-form" onsubmit="uploadReview()">
+        <input type="text" name="review-name" id="review-name" placeholder="Enter your name...">
+        <select name="review-rating" id="review-rating">
+          <option value="none" disabled selected>Tap to select Rating</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+        <textarea name="review-comment" id="review-comment" placeholder="Did you visit this restaurant? What do you think about it?"></textarea>
+        <div><input type="submit" id="review-submit"></div>
+      </form>
     </section>
   </main>
 
