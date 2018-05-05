@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
   fetchCuisines();
   // Moved up here in case the request of the map fails, this still runs
   updateRestaurants(true);
-  registerSW();
+  // registerSW();
 });
 
 /**

@@ -11,6 +11,10 @@ class DBHelper {
     const port = 1337 // Change this to your server port
     return `http://localhost:${port}/restaurants`;
   }
+  static get DATABASE_DOMAIN() {
+    const port = 1337 // Change this to your server port
+    return `http://localhost:${port}`;
+  }
 
   /**
    * Fetch all restaurants.
@@ -33,6 +37,32 @@ class DBHelper {
         console.error('Fetch from network failed!: ' + e);
         console.log('Getting from IndexedDB...');
         DBHelper.getFromIDB((e, restaurants) => callback(null, restaurants));
+      });
+  }
+
+  /**
+   * Fetch all reviews.
+   */
+  static fetchReviews(callback) {
+    // fetch restaurants
+    // fetch(`${DBHelper.DATABASE_DOMAIN}/reviews`)
+    const reviews_url = DBHelper.DATABASE_DOMAIN + '/reviews';
+    fetch(reviews_url)
+
+      // if successful, parse the JSON
+      .then(response => response.json())
+
+      // then cache the reviews
+      .then(reviews => {
+        // DBHelper.insertToIDB(restaurants);
+        callback(null, reviews);
+      })
+
+      // Fetch from indexdb in case network is not available
+      .catch(e => {
+        console.error('Fetch from network failed!: ' + e);
+        // console.log('Getting from IndexedDB...');
+        // DBHelper.getFromIDB((e, restaurants) => callback(null, restaurants));
       });
   }
 
@@ -118,6 +148,32 @@ class DBHelper {
         }
       }
     });
+  }
+
+  /**
+   * Fetch a reviews by its ID.
+   */
+  static fetchReviewsById(id, callback) {
+    // fetch reviews
+    // fetch(`${DBHelper.DATABASE_DOMAIN}/reviews/?restaurant_id='${id}'`)
+    const reviews_url = DBHelper.DATABASE_DOMAIN + '/reviews/?restaurant_id=' + id;
+    fetch(reviews_url)
+
+      // if successful, parse the JSON
+      .then(response => response.json())
+
+      // then cache the reviews
+      .then(reviews => {
+        // DBHelper.insertToIDB(restaurants);
+        callback(null, reviews);
+      })
+
+      // Fetch from indexdb in case network is not available
+      .catch(e => {
+        console.error('Fetch from network failed!: ' + e);
+        // console.log('Getting from IndexedDB...');
+        // DBHelper.getFromIDB((e, restaurants) => callback(null, restaurants));
+      });
   }
 
   /**

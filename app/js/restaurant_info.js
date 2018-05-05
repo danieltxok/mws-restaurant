@@ -46,6 +46,32 @@ fetchRestaurantFromURL = (callback) => {
 }
 
 /**
+ * Get reviews from page URL.
+ */
+fetchReviewsFromURL = (callback) => {
+  if (self.reviews) { // reviews already fetched!
+    callback(null, self.reviews)
+    return;
+  }
+  const id = getParameterByName('id');
+  if (!id) { // no id found in URL
+    error = 'No restaurant id in URL'
+    callback(error, null);
+  } else {
+    DBHelper.fetchReviewsById(id, (error, reviews) => {
+      self.reviews = reviews;
+      if (!reviews) {
+        console.error(error);
+        return;
+      }
+      // fill reviews
+      fillReviewsHTML();
+      callback(null, restaurant)
+    });
+  }
+}
+
+/**
  * Create restaurant HTML and add it to the webpage
  */
 fillRestaurantHTML = (restaurant = self.restaurant) => {
@@ -86,8 +112,8 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   if (restaurant.operating_hours) {
     fillRestaurantHoursHTML();
   }
-  // fill reviews
-  fillReviewsHTML();
+  // fetch reviews
+  fetchReviewsFromURL();
 }
 
 /**
@@ -113,7 +139,7 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
 /**
  * Create all reviews HTML and add them to the webpage.
  */
-fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+fillReviewsHTML = (reviews = self.reviews) => {
   const container = document.getElementById('reviews-container');
   const title = document.createElement('h3');
   title.innerHTML = 'Reviews';
@@ -121,7 +147,7 @@ fillReviewsHTML = (reviews = self.restaurant.reviews) => {
 
   if (!reviews) {
     const noReviews = document.createElement('p');
-    noReviews.innerHTML = 'No reviews yet!';
+    noReviews.innerHTML = 'No reviews yet. Enter yours!';
     container.appendChild(noReviews);
     return;
   }
@@ -163,7 +189,7 @@ createReviewHTML = (review) => {
 /**
  * Add restaurant name to the breadcrumb navigation menu
  */
-fillBreadcrumb = (restaurant=self.restaurant) => {
+fillBreadcrumb = (restaurant = self.restaurant) => {
   const breadcrumb = document.getElementById('breadcrumb');
   const li = document.createElement('li');
   li.innerHTML = restaurant.name;
@@ -186,3 +212,41 @@ getParameterByName = (name, url) => {
     return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
+
+/**
+ * Submit review.
+ */
+uploadReview = (restaurant = self.restaurant) => {
+  const id = restaurant.id;
+  const name = document.getElementById("review-name").value;
+  const rating = document.getElementById("review-rating").value;
+  const comment = document.getElementById("review-comment").value;
+
+  // Put all the parameters together and ready to post
+  let review_info = {
+    restaurant_id: id,
+    name: name,
+    rating: rating,
+    comments: comment,
+  }
+    // https://stackoverflow.com/questions/29775797/fetch-post-json-data
+    // https://github.com/github/fetch/issues/263
+    fetch(`${DBHelper.DATABASE_DOMAIN}/reviews/`, {
+        method: 'post',
+        body: JSON.stringify(review_info)
+      })
+      .then(res => res.json())
+      .then(res => {
+        console.log(res);
+        alert('Review submission was successful!');
+      })
+      .catch(error => {
+        console.log('There was an error when submitting your review');
+      });
+
+    // reload the doc and we should see it
+    window.location.reload();
+
+  return false;
+}
+
