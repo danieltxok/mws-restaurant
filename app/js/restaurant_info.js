@@ -64,9 +64,12 @@ fetchReviewsFromURL = (callback) => {
         console.error(error);
         return;
       }
+      // debugger;
       // fill reviews
       fillReviewsHTML();
-      callback(null, restaurant)
+      // debugger;
+      // callback(null, reviews);
+      return reviews;
     });
   }
 }

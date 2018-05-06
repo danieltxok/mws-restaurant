@@ -28,48 +28,22 @@ class DBHelper {
 
       // then cache the restaurants
       .then(restaurants => {
-        DBHelper.insertToIDB(restaurants);
+        DBHelper.insertRestaurantsToIDB(restaurants);
         callback(null, restaurants);
       })
 
       // Fetch from indexdb in case network is not available
       .catch(e => {
-        console.error('Fetch from network failed!: ' + e);
+        console.log('Fetch from network failed!: ' + e);
         console.log('Getting from IndexedDB...');
-        DBHelper.getFromIDB((e, restaurants) => callback(null, restaurants));
-      });
-  }
-
-  /**
-   * Fetch all reviews.
-   */
-  static fetchReviews(callback) {
-    // fetch restaurants
-    // fetch(`${DBHelper.DATABASE_DOMAIN}/reviews`)
-    const reviews_url = DBHelper.DATABASE_DOMAIN + '/reviews';
-    fetch(reviews_url)
-
-      // if successful, parse the JSON
-      .then(response => response.json())
-
-      // then cache the reviews
-      .then(reviews => {
-        // DBHelper.insertToIDB(restaurants);
-        callback(null, reviews);
-      })
-
-      // Fetch from indexdb in case network is not available
-      .catch(e => {
-        console.error('Fetch from network failed!: ' + e);
-        // console.log('Getting from IndexedDB...');
-        // DBHelper.getFromIDB((e, restaurants) => callback(null, restaurants));
+        DBHelper.getRestaurantsFromIDB((e, restaurants) => callback(null, restaurants));
       });
   }
 
   /**
    * Insert restaurants to DB.
    */
-  static insertToIDB(restaurants) {
+  static insertRestaurantsToIDB(restaurants) {
     const DB_NAME = 'udacity-restaurants';
     const DB_VERSION = 1;
     const DB_STORE_NAME = 'restaurants';
@@ -84,9 +58,15 @@ class DBHelper {
     // it is triggered when a database of a bigger version number than the existing stored database is loaded
     // or when there is no previous database
     // we execute it before onsucess to create the store
-    req.onupgradeneeded = () => { 
+    req.onupgradeneeded = () => {
       const db = req.result;
       const store = db.createObjectStore(DB_STORE_NAME, {keyPath: "id"});
+      // // create now a store for the reviews of each restaurant
+      // restaurants.forEach(restaurant => {
+      //   db.createObjectStore('reviews' + restaurant.id, {
+      //     keyPath: "id"
+      //   });
+      // });
     };
 
     // if success
@@ -106,9 +86,48 @@ class DBHelper {
   }
 
   /**
+   * Insert reviews to DB.
+   */
+  static insertReviewsToIDB(restaurantId, reviews) {
+    const DB_NAME = 'udacity-reviews';
+    const DB_VERSION = 1;
+    const DB_STORE_NAME = 'reviews-' + restaurantId;
+
+    // Get correct IDB for all browsers
+    const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+    // Let us open our database
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    // onupgradeneeded is the only place where you can alter the structure of the database
+    // it is triggered when a database of a bigger version number than the existing stored database is loaded
+    // or when there is no previous database
+    // we execute it before onsucess to create the store
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      // const store = db.createObjectStore(DB_STORE_NAME, { keyPath: "id" });
+      for (let i = 1; i < 11; i++) {
+        db.createObjectStore('reviews-' + i, { keyPath: "id" });
+      }
+    };
+    // if success
+    req.onsuccess = () => {
+      // Start with a transaction to store values in the previously created objectStore.
+      const db = req.result;
+      const transac = db.transaction(DB_STORE_NAME, "readwrite");
+      const store = transac.objectStore(DB_STORE_NAME);
+      // Store data
+      reviews.forEach(review => {
+        store.put(review);
+      });
+    }
+
+    // if error
+    req.onerror = e => console.error('IDB error: ' + e);
+  }
+
+  /**
    * Get restaurants from IndexedDB.
    */
-  static getFromIDB(callback) {
+  static getRestaurantsFromIDB(callback) {
     const DB_NAME = 'udacity-restaurants';
     const DB_VERSION = 1;
     const DB_STORE_NAME = 'restaurants';
@@ -127,6 +146,31 @@ class DBHelper {
       const store = transac.objectStore(DB_STORE_NAME);
       const getData = store.getAll();
 
+      getData.onsuccess = () => callback(null, getData.result);
+    }
+  }
+
+  /**
+   * Get reviews from IndexedDB.
+   */
+  static getReviewsFromIDB(id, callback) {
+    const DB_NAME = 'udacity-reviews';
+    const DB_VERSION = 1;
+    const DB_STORE_NAME = 'reviews-' + id;
+
+    // Get correct IDB for all browsers
+    const indexedDB2 = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+
+    // Let us open our database
+    const req2 = indexedDB2.open(DB_NAME, DB_VERSION);
+
+    // if success
+    req2.onsuccess = () => {
+      // Start with a new transaction to read values
+      const db2 = req2.result;
+      const transac2 = db2.transaction(DB_STORE_NAME, "readwrite");
+      const store2 = transac2.objectStore(DB_STORE_NAME);
+      const getData = store2.getAll();
       getData.onsuccess = () => callback(null, getData.result);
     }
   }
@@ -164,15 +208,17 @@ class DBHelper {
 
       // then cache the reviews
       .then(reviews => {
-        // DBHelper.insertToIDB(restaurants);
+        DBHelper.insertReviewsToIDB(id, reviews);
         callback(null, reviews);
       })
 
       // Fetch from indexdb in case network is not available
       .catch(e => {
-        console.error('Fetch from network failed!: ' + e);
-        // console.log('Getting from IndexedDB...');
-        // DBHelper.getFromIDB((e, restaurants) => callback(null, restaurants));
+        console.log('Fetch from network failed!: ' + e);
+        console.log('Getting from IndexedDB...');
+        DBHelper.getReviewsFromIDB(id, (e, id) => callback(null, id));
+        // DBHelper.getReviewsFromIDB(id);
+        // callback(null, id);
       });
   }
 
