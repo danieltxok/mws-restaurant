@@ -272,12 +272,7 @@ addMarkersToMap = (restaurants = self.restaurants) => {
 registerSW = () => {
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js').then(registration => {
-        console.log('SW registered: ', registration.scope);
-        if ('sync' in registration) {
-          console.log('Background Sync is supported');
-        }
-      })
+      navigator.serviceWorker.register('sw.js').then(registration => console.log('SW registered: ', registration.scope))
         .catch(e => console.log('SW registration failed: ', e));
     })
   }
