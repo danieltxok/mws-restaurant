@@ -44,15 +44,15 @@ class DBHelper {
    * Insert restaurants to DB.
    */
   static insertRestaurantsToIDB(restaurants) {
-    const DB_NAME = 'udacity-restaurants';
-    const DB_VERSION = 1;
-    const DB_STORE_NAME = 'restaurants';
+    const DB_NAME_REST = 'udacity-restaurants';
+    const DB_VERSION_REST = 1;
+    const DB_STORE_NAME_REST = 'restaurants';
 
     // Get correct IDB for all browsers
     const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
 
     // Let us open our database
-    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    const req = indexedDB.open(DB_NAME_REST, DB_VERSION_REST);
 
     // onupgradeneeded is the only place where you can alter the structure of the database
     // it is triggered when a database of a bigger version number than the existing stored database is loaded
@@ -60,7 +60,7 @@ class DBHelper {
     // we execute it before onsucess to create the store
     req.onupgradeneeded = () => {
       const db = req.result;
-      const store = db.createObjectStore(DB_STORE_NAME, {keyPath: "id"});
+      const store = db.createObjectStore(DB_STORE_NAME_REST, {keyPath: "id"});
       // // create now a store for the reviews of each restaurant
       // restaurants.forEach(restaurant => {
       //   db.createObjectStore('reviews' + restaurant.id, {
@@ -73,7 +73,7 @@ class DBHelper {
     req.onsuccess = () => {
       // Start with a transaction to store values in the previously created objectStore.
       const db = req.result;
-      const store = db.transaction(DB_STORE_NAME, "readwrite").objectStore(DB_STORE_NAME);
+      const store = db.transaction(DB_STORE_NAME_REST, "readwrite").objectStore(DB_STORE_NAME_REST);
 
       // Store data
       restaurants.forEach(restaurant => {
@@ -89,32 +89,36 @@ class DBHelper {
    * Insert reviews to DB.
    */
   static insertReviewsToIDB(restaurantId, reviews) {
-    const DB_NAME = 'udacity-reviews';
-    const DB_VERSION = 1;
-    const DB_STORE_NAME = 'reviews-' + restaurantId;
+    const DB_NAME_REVIEW = 'udacity-reviews';
+    const DB_VERSION_REVIEW = 1;
+    const DB_STORE_NAME_REVIEW = 'reviews-' + restaurantId;
 
     // Get correct IDB for all browsers
     const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
     // Let us open our database
-    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    const req = indexedDB.open(DB_NAME_REVIEW, DB_VERSION_REVIEW);
     // onupgradeneeded is the only place where you can alter the structure of the database
     // it is triggered when a database of a bigger version number than the existing stored database is loaded
     // or when there is no previous database
     // we execute it before onsucess to create the store
+    debugger;
     req.onupgradeneeded = () => {
       const db = req.result;
+      debugger;
       // const store = db.createObjectStore(DB_STORE_NAME, { keyPath: "id" });
       for (let i = 1; i < 11; i++) {
         db.createObjectStore('reviews-' + i, { keyPath: "id" });
       }
     };
+    debugger;
     // if success
     req.onsuccess = () => {
       // Start with a transaction to store values in the previously created objectStore.
       const db = req.result;
-      const transac = db.transaction(DB_STORE_NAME, "readwrite");
-      const store = transac.objectStore(DB_STORE_NAME);
+      const transac = db.transaction(DB_STORE_NAME_REVIEW, "readwrite");
+      const store = transac.objectStore(DB_STORE_NAME_REVIEW);
       // Store data
+      debugger;
       reviews.forEach(review => {
         store.put(review);
       });
@@ -337,6 +341,47 @@ class DBHelper {
       animation: google.maps.Animation.DROP
     });
     return marker;
+  }
+
+  /**
+  * Insert reviews to offline store.
+  */
+  static insertReviewsToIDBOffline(review_info) {
+    const DB_NAME_OFFLINE = 'udacity-offline';
+    const DB_VERSION_OFFLINE = 1;
+    const DB_STORE_NAME_OFFLINE = 'offline-store';
+
+    // Get correct IDB for all browsers
+    const indexedDBOffline = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+    // Let us open our database
+    const reqOffline = indexedDBOffline.open(DB_NAME_OFFLINE, DB_VERSION_OFFLINE);
+    // onupgradeneeded is the only place where you can alter the structure of the database
+    // it is triggered when a database of a bigger version number than the existing stored database is loaded
+    // or when there is no previous database
+    // we execute it before onsucess to create the store
+    // debugger;
+    reqOffline.onupgradeneeded = () => {
+      const datab = reqOffline.result;
+      // debugger;
+      const offlinestore = datab.createObjectStore(DB_STORE_NAME_OFFLINE, { keyPath: "restaurant_id" });
+    };
+    
+    // // if success
+    reqOffline.onsuccess = () => {
+      // Start with a transaction to store values in the previously created objectStore.
+      const datab = reqOffline.result;
+      const transac = datab.transaction(DB_STORE_NAME_OFFLINE, "readwrite");
+      const offlinestore = transac.objectStore(DB_STORE_NAME_OFFLINE);
+      debugger;
+      // Store data
+      // if there is another entry in the store with the same key (in this case restaurant_id) it will overwrite it. This way, only one review per user per restaurant when offline
+      offlinestore.put(review_info);
+    }
+
+    // // if error
+    reqOffline.onerror = e => console.error('IDB error: ' + e);
+    // console.log(review_info);
+    // debugger;
   }
 
 }

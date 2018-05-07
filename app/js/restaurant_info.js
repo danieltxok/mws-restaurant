@@ -64,10 +64,8 @@ fetchReviewsFromURL = (callback) => {
         console.error(error);
         return;
       }
-      // debugger;
       // fill reviews
       fillReviewsHTML();
-      // debugger;
       // callback(null, reviews);
       return reviews;
     });
@@ -241,14 +239,18 @@ uploadReview = (restaurant = self.restaurant) => {
       .then(res => res.json())
       .then(res => {
         console.log(res);
+        console.log('Review submission was successful!');
         alert('Review submission was successful!');
       })
       .catch(error => {
-        console.log('There was an error when submitting your review');
+        console.log(error);
+        console.log('Network error when submitting your review. We will automatically send your review when online');
+        alert('There was an error when submitting your review. We will automatically send your review when online');
+        DBHelper.insertReviewsToIDBOffline(review_info);
       });
 
     // reload the doc and we should see it
-    window.location.reload();
+    // setTimeout(function () { window.location.reload(); }, 1000);
 
   return false;
 }
