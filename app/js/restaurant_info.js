@@ -250,8 +250,17 @@ uploadReview = (restaurant = self.restaurant) => {
       });
 
     // reload the doc and we should see it
-    // setTimeout(function () { window.location.reload(); }, 1000);
+    setTimeout(function () { window.location.reload(); }, 1000);
 
   return false;
 }
 
+
+/**
+ * Check if offline reviews in database
+ */
+(checkReviewsOffline = () => {
+  // debugger;
+  DBHelper.insertOfflineReviews();
+  // debugger;
+})();

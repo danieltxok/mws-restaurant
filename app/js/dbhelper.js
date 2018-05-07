@@ -60,7 +60,9 @@ class DBHelper {
     // we execute it before onsucess to create the store
     req.onupgradeneeded = () => {
       const db = req.result;
-      const store = db.createObjectStore(DB_STORE_NAME_REST, {keyPath: "id"});
+      const store = db.createObjectStore(DB_STORE_NAME_REST, {
+        keyPath: "id"
+      });
       // // create now a store for the reviews of each restaurant
       // restaurants.forEach(restaurant => {
       //   db.createObjectStore('reviews' + restaurant.id, {
@@ -101,16 +103,15 @@ class DBHelper {
     // it is triggered when a database of a bigger version number than the existing stored database is loaded
     // or when there is no previous database
     // we execute it before onsucess to create the store
-    debugger;
     req.onupgradeneeded = () => {
       const db = req.result;
-      debugger;
       // const store = db.createObjectStore(DB_STORE_NAME, { keyPath: "id" });
       for (let i = 1; i < 11; i++) {
-        db.createObjectStore('reviews-' + i, { keyPath: "id" });
+        db.createObjectStore('reviews-' + i, {
+          keyPath: "id"
+        });
       }
     };
-    debugger;
     // if success
     req.onsuccess = () => {
       // Start with a transaction to store values in the previously created objectStore.
@@ -118,7 +119,6 @@ class DBHelper {
       const transac = db.transaction(DB_STORE_NAME_REVIEW, "readwrite");
       const store = transac.objectStore(DB_STORE_NAME_REVIEW);
       // Store data
-      debugger;
       reviews.forEach(review => {
         store.put(review);
       });
@@ -344,12 +344,12 @@ class DBHelper {
   }
 
   /**
-  * Insert reviews to offline store.
-  */
+   * Insert reviews to offline store.
+   */
   static insertReviewsToIDBOffline(review_info) {
     const DB_NAME_OFFLINE = 'udacity-offline';
     const DB_VERSION_OFFLINE = 1;
-    const DB_STORE_NAME_OFFLINE = 'offline-store';
+    const DB_STORE_NAME_OFFLINE = 'offline';
 
     // Get correct IDB for all browsers
     const indexedDBOffline = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
@@ -359,20 +359,19 @@ class DBHelper {
     // it is triggered when a database of a bigger version number than the existing stored database is loaded
     // or when there is no previous database
     // we execute it before onsucess to create the store
-    // debugger;
     reqOffline.onupgradeneeded = () => {
       const datab = reqOffline.result;
-      // debugger;
-      const offlinestore = datab.createObjectStore(DB_STORE_NAME_OFFLINE, { keyPath: "restaurant_id" });
+      const offlinestore = datab.createObjectStore(DB_STORE_NAME_OFFLINE, {
+        keyPath: "restaurant_id"
+      });
     };
-    
+
     // // if success
     reqOffline.onsuccess = () => {
       // Start with a transaction to store values in the previously created objectStore.
       const datab = reqOffline.result;
       const transac = datab.transaction(DB_STORE_NAME_OFFLINE, "readwrite");
       const offlinestore = transac.objectStore(DB_STORE_NAME_OFFLINE);
-      debugger;
       // Store data
       // if there is another entry in the store with the same key (in this case restaurant_id) it will overwrite it. This way, only one review per user per restaurant when offline
       offlinestore.put(review_info);
@@ -381,7 +380,114 @@ class DBHelper {
     // // if error
     reqOffline.onerror = e => console.error('IDB error: ' + e);
     // console.log(review_info);
-    // debugger;
+  }
+
+  /**
+   * Insert reviews to offline store.
+   */
+  static insertReviewsToIDBOffline(review_info) {
+    const DB_NAME_OFFLINE = 'udacity-offline';
+    const DB_VERSION_OFFLINE = 1;
+    const DB_STORE_NAME_OFFLINE = 'offline';
+
+    // Get correct IDB for all browsers
+    const indexedDBOffline = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+    // Let us open our database
+    const reqOffline = indexedDBOffline.open(DB_NAME_OFFLINE, DB_VERSION_OFFLINE);
+    // onupgradeneeded is the only place where you can alter the structure of the database
+    // it is triggered when a database of a bigger version number than the existing stored database is loaded
+    // or when there is no previous database
+    // we execute it before onsucess to create the store
+    reqOffline.onupgradeneeded = () => {
+      const datab = reqOffline.result;
+      const offlinestore = datab.createObjectStore(DB_STORE_NAME_OFFLINE, {
+        keyPath: "restaurant_id"
+      });
+    };
+
+    // // if success
+    reqOffline.onsuccess = () => {
+      // Start with a transaction to store values in the previously created objectStore.
+      const datab = reqOffline.result;
+      const transac = datab.transaction(DB_STORE_NAME_OFFLINE, "readwrite");
+      const offlinestore = transac.objectStore(DB_STORE_NAME_OFFLINE);
+      // Store data
+      // if there is another entry in the store with the same key (in this case restaurant_id) it will overwrite it. This way, only one review per user per restaurant when offline
+      offlinestore.put(review_info);
+    }
+
+    // // if error
+    reqOffline.onerror = e => console.error('IDB error: ' + e);
+  }
+
+  /**
+   * Insert offline reviews to server.
+   */
+  static insertOfflineReviews() {
+    const DB_NAME_OFFLINE = 'udacity-offline';
+    const DB_VERSION_OFFLINE = 1;
+    const DB_STORE_NAME_OFFLINE = 'offline';
+
+    const indexedDBSync = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+    const offlineSync = indexedDBSync.open(DB_NAME_OFFLINE, DB_VERSION_OFFLINE);
+
+    // if success
+    offlineSync.onsuccess = () => {
+      // Start with a transaction to store values in the previously created objectStore.
+      const databas = offlineSync.result;
+      const transact = databas.transaction(DB_STORE_NAME_OFFLINE, "readonly");
+      const offlinestoresync = transact.objectStore(DB_STORE_NAME_OFFLINE);
+      const getOfflineData = offlinestoresync.getAll();
+      getOfflineData.onsuccess = () => {
+        if (getOfflineData.result) {
+          console.log(getOfflineData.result[0].restaurant_id);
+          console.log(getOfflineData.result[0]);
+
+          fetch(`${DBHelper.DATABASE_DOMAIN}/reviews/`, {
+            method: 'post',
+            body: JSON.stringify(getOfflineData.result[0])
+          })
+            .then(res => res.json())
+            .then(res => {
+              console.log(res);
+              console.log('Offline review submission was successful!');
+              DBHelper.removeOfflineReviews(getOfflineData.result[0].restaurant_id);
+              // alert('Review submission was successful!');
+            })
+            .catch(error => {
+              console.log('Cannot post offline reviews yet!')
+            });
+
+        } else {
+          console.log('No offline reviews to sync');
+        };
+
+      };
+    }
+
+  }
+
+  /**
+   * Insert offline reviews to server.
+   */
+  static removeOfflineReviews(key) {
+    const DB_NAME_OFFLINE = 'udacity-offline';
+    const DB_VERSION_OFFLINE = 1;
+    const DB_STORE_NAME_OFFLINE = 'offline';
+
+    const indexedDBSync = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+    const offlineSync = indexedDBSync.open(DB_NAME_OFFLINE, DB_VERSION_OFFLINE);
+
+    offlineSync.onsuccess = () => {
+      // Start with a transaction to store values in the previously created objectStore.
+      const databaseoff = offlineSync.result;
+      const requestdelete = databaseoff.transaction(DB_STORE_NAME_OFFLINE, "readwrite").objectStore(DB_STORE_NAME_OFFLINE).delete(key);
+
+      requestdelete.onsuccess = () => {
+        console.log('Offline review removed from IndexedDB');
+      };
+    }
+
   }
 
 }
