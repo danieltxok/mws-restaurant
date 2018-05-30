@@ -17,7 +17,9 @@ const urlsToStaticCache = [
     'img/6_sqip.svg',
     'img/7_sqip.svg',
     'img/8_sqip.svg',
-    'img/9_sqip.svg'
+    'img/9_sqip.svg',
+    'img/icons/fav-icon-o.png',
+    'img/icons/fav-icon.png'
 ];
 
 

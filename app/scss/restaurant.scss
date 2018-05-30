@@ -111,16 +111,26 @@ main {
             line-height: 1.5;
             margin: 0;
         }
-        #restaurant-img {
+        #restaurant-img-container {
+            position: relative;
             width: 100%;
-            img {
-                width: 100%;
-            }
             @include up-600 {
                 grid-row: 2/4;
             }
             @include up-900 {
                 grid-row: 2/5;
+            }
+            #restaurant-img {
+                width: 100%;
+                img {
+                    width: 100%;
+                }
+            }
+            #restaurant-fav-icon {
+                width: 40px;
+                position: absolute;
+                top: 5px;
+                right: 5px;
             }
         }
         #restaurant-cuisine {

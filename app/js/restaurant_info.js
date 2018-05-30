@@ -103,6 +103,14 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   image.alt = restaurant.name + ' restaurant';
   picture.append(image);
 
+  const icon = document.getElementById('restaurant-fav-icon');
+  icon.src = "/img/icons/fav-icon-o.png";
+  // if () {
+  //   icon.src = "/img/icons/fav-icon-o.png";
+  // } else {
+  //   icon.src = "/img/icons/fav-icon-o.png";
+  // }
+
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
 
