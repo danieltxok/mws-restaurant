@@ -9,16 +9,6 @@ const urlsToStaticCache = [
     '/js/dbhelper.js',
     '/js/main.js',
     '/js/restaurant_info.js',
-    'img/1_sqip.jpg',
-    'img/2_sqip.jpg',
-    'img/3_sqip.jpg',
-    'img/4_sqip.jpg',
-    'img/5_sqip.jpg',
-    'img/6_sqip.jpg',
-    'img/7_sqip.jpg',
-    'img/8_sqip.jpg',
-    'img/9_sqip.jpg',
-    'img/10_sqip.jpg',
     'img/1_sqip.svg',
     'img/2_sqip.svg',
     'img/3_sqip.svg',
@@ -27,8 +17,7 @@ const urlsToStaticCache = [
     'img/6_sqip.svg',
     'img/7_sqip.svg',
     'img/8_sqip.svg',
-    'img/9_sqip.svg',
-    'img/10_sqip.svg'
+    'img/9_sqip.svg'
 ];
 
 
