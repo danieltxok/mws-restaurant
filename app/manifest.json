@@ -4,9 +4,8 @@
     "theme_color": "#3397db",
     "background_color": "#f3f3f3",
     "display": "fullscreen",
-    "Scope": "/",
+    "scope": "/",
     "start_url": "http://localhost:3000/",
-    // "start_url": "https://mws-dbarcosb-restaurants.netlify.com/",
     "icons": [
         {
             "src": "img/icons/icon-72x72.png",
