@@ -444,9 +444,9 @@ class DBHelper {
           console.log(getOfflineData.result[0]);
 
           fetch(`${DBHelper.DATABASE_DOMAIN}/reviews/`, {
-            method: 'post',
-            body: JSON.stringify(getOfflineData.result[0])
-          })
+              method: 'post',
+              body: JSON.stringify(getOfflineData.result[0])
+            })
             .then(res => res.json())
             .then(res => {
               console.log(res);
@@ -488,6 +488,19 @@ class DBHelper {
       };
     }
 
+  }
+
+  /**
+   * Add restaurant to favourites.
+   */
+  static addRestaurantToFav(restaurantId, isFav, callback) {
+    const url = DBHelper.DATABASE_URL + '/' + restaurantId + '/?is_favorite=' + isFav;
+    console.log(isFav);
+    fetch(url, {
+        method: 'put'
+      })
+      .then(res => callback(null, 1))
+      .catch(err => callback(err, null));
   }
 
 }
