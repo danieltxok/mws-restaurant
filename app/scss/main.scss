@@ -68,6 +68,7 @@ header {
 // main
 main {
     #map-container {
+        position: relative;
         #map {
             height: 332px;
             width: 100%;
@@ -84,6 +85,18 @@ main {
             @include up-600 {
                 height: 400px;
                 width: 100%;
+                display: none;
+            }
+        }
+        #map-text {
+            position: absolute;
+            bottom: 140px;
+            right: 100px;
+            background-color: $text-color-footer;
+            color: white;
+            padding-left: 30px;
+            padding-right: 30px;
+            @include up-600 {
                 display: none;
             }
         }

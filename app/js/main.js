@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
  * Load secondary stuff after fully load.
  */
 window.addEventListener('load', (event) => {
-  swapMap();
+  // swapMap();
   lazyLoad();
 });
 
@@ -310,6 +310,8 @@ lazyLoad = () => {
 swapMap = () => {
   const placeholder = document.getElementById('map-placeholder');
   const map = document.getElementById('map');
+  const text = document.getElementById('map-text');
   placeholder.style.display = 'none';
   map.style.display = 'block';
+  text.style.display = 'none';
 }
