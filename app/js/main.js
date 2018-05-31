@@ -11,7 +11,12 @@ document.addEventListener('DOMContentLoaded', (event) => {
   fetchNeighborhoods();
   fetchCuisines();
   // Moved up here in case the request of the map fails, this still runs
-  updateRestaurants(true);
+  // If online, lazyloading. If offline, no lazy loading
+  if (typeof google !== 'undefined') {
+    updateRestaurants(true);
+  } else {
+    updateRestaurants();
+  }
   registerSW();
 });
 
@@ -19,7 +24,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
  * Load secondary stuff after fully load.
  */
 window.addEventListener('load', (event) => {
-  // swapMap();
   lazyLoad();
 });
 
@@ -256,14 +260,16 @@ createRestaurantHTMLwithoutLL = (restaurant) => {
  * Add markers for current restaurants to the map.
  */
 addMarkersToMap = (restaurants = self.restaurants) => {
-  restaurants.forEach(restaurant => {
-    // Add marker to the map
-    const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.map);
-    google.maps.event.addListener(marker, 'click', () => {
-      window.location.href = marker.url
+  if (typeof google !== 'undefined') {
+    restaurants.forEach(restaurant => {
+      // Add marker to the map
+      const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.map);
+      google.maps.event.addListener(marker, 'click', () => {
+        window.location.href = marker.url
+      });
+      self.markers.push(marker);
     });
-    self.markers.push(marker);
-  });
+  }
 }
 
 /**
@@ -272,8 +278,8 @@ addMarkersToMap = (restaurants = self.restaurants) => {
 registerSW = () => {
   if ('serviceWorker' in navigator) {
     // window.addEventListener('load', () => {
-      navigator.serviceWorker.register('../sw.js').then(registration => console.log('SW registered: ', registration.scope))
-        .catch(e => console.log('SW registration failed: ', e));
+    navigator.serviceWorker.register('../sw.js').then(registration => console.log('SW registered: ', registration.scope))
+      .catch(e => console.log('SW registration failed: ', e));
     // })
   }
 }
