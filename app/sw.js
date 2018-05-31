@@ -29,6 +29,7 @@ const urlsToStaticCache = [
     'img/7_sqip.svg',
     'img/8_sqip.svg',
     'img/9_sqip.svg',
+    'img/undefined_sqip.svg',
     'img/1.jpg',
     'img/2.jpg',
     'img/3.jpg',
@@ -38,6 +39,7 @@ const urlsToStaticCache = [
     'img/7.jpg',
     'img/8.jpg',
     'img/9.jpg',
+    'img/undefined.jpg',
     'img/icons/fav-icon-o.png',
     'img/icons/fav-icon.png'
 ];
