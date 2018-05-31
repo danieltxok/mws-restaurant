@@ -87,24 +87,48 @@ self.addEventListener('fetch', event => {
     // delays the event until the promise resolves
     event.respondWith(
 
-        // Check in cache for the request
-        caches.match(event.request).then(response => {
+        // // Network falling back to cache strategy
+        // fetch(event.request).catch(function () {
+        //     return caches.match(event.request);
+        // })
 
-            // If response in cache, return cached version
-            // If response not in cache, fetch & cache
-            return response || fetch(event.request);
-            // return response || fetch(event.request).then(response => {
+        // // Offline first strategy would be ideal
+        // // Check in cache for the request
+        // caches.match(event.request).then(response => {
 
-            //     // Open the cache
-            //     caches.open(responsesCache).then(cache => {
+        //     // If response in cache, return cached version
+        //     // If response not in cache, fetch & cache
+        //     return response || fetch(event.request).then(response => {
 
-            //         // Put the request/response(cloned) in the cache
-            //         cache.put(event.request, response.clone());
+        //         // Open the cache
+        //         caches.open(responsesCache).then(cache => {
 
-            //         // return response
-            //         return response;
-            //     });
-            // });
+        //             // Put the request/response(cloned) in the cache
+        //             cache.put(event.request, response.clone());
+
+        //             // return response
+        //             return response;
+        //         });
+        //     });
+        // })
+
+        // I will combine both
+        // Network falling back to cache
+        // But if network successful, put into cache
+        fetch(event.request).then(response => {
+            // Open the cache
+            caches.open(responsesCache).then(cache => {
+
+                // Put the request/response(cloned) in the cache
+                cache.put(event.request, response.clone());
+
+                // return response
+                return response;
+            });
+        }).catch(function () {
+            return caches.match(event.request);
         })
+
     );
+
 });
