@@ -5,20 +5,41 @@ var map;
  * Initialize Google map, called from HTML.
  */
 window.initMap = () => {
+//   fetchRestaurantFromURL((error, restaurant) => {
+//     if (error) { // Got an error!
+//       console.error(error);
+//     } else {
+//       self.map = new google.maps.Map(document.getElementById('map'), {
+//         zoom: 16,
+//         center: restaurant.latlng,
+//         scrollwheel: false
+//       });
+//       fillBreadcrumb();
+//       DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
+//     }
+//   });
+}
+
+/**
+ * Fetch Restaurant when the page is loaded.
+ */
+document.addEventListener('DOMContentLoaded', (event) => {
   fetchRestaurantFromURL((error, restaurant) => {
     if (error) { // Got an error!
       console.error(error);
     } else {
-      self.map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 16,
-        center: restaurant.latlng,
-        scrollwheel: false
-      });
+      if (typeof google !== 'undefined') {
+        self.map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 16,
+          center: restaurant.latlng,
+          scrollwheel: false
+        });
+      }
       fillBreadcrumb();
       DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
     }
   });
-}
+});
 
 /**
  * Get current restaurant from page URL.
@@ -76,12 +97,13 @@ fetchReviewsFromURL = (callback) => {
  * Create restaurant HTML and add it to the webpage
  */
 fillRestaurantHTML = (restaurant = self.restaurant) => {
-    const name = document.getElementById('restaurant-name');
-    name.innerHTML = restaurant.name;
+  const name = document.getElementById('restaurant-name');
+  name.innerHTML = restaurant.name;
 
-    const picture = document.getElementById('restaurant-img');
-    picture.className = 'restaurant-img';
+  const picture = document.getElementById('restaurant-img');
+  picture.className = 'restaurant-img';
 
+  if (typeof google !== 'undefined') {
     const source1 = document.createElement('source');
     source1.srcset = DBHelper.imageUrlForRestaurant(restaurant).split('.')[0] + '_w400.webp 400w, ';
     source1.srcset = source1.srcset.concat(DBHelper.imageUrlForRestaurant(restaurant).split('.')[0] + '_w600.webp 600w, ');
@@ -97,189 +119,190 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
     source2.sizes = '(max-width: 600px) 90vw, (max-width: 90px) 60vw, (min-width: 901px) 45vw';
     source2.type = 'image/jpg';
     picture.append(source2);
+  }
 
-    const image = document.createElement('img');
-    image.src = DBHelper.imageUrlForRestaurant(restaurant);
-    image.alt = restaurant.name + ' restaurant';
-    picture.append(image);
+  const image = document.createElement('img');
+  image.src = DBHelper.imageUrlForRestaurant(restaurant) + '.jpg';
+  image.alt = restaurant.name + ' restaurant';
+  picture.append(image);
 
-    const icon = document.getElementById('restaurant-fav-icon');
-    if (restaurant.is_favorite === false || restaurant.is_favorite === "false") {
-      icon.src = "/img/icons/fav-icon-o.png";
+  const icon = document.getElementById('restaurant-fav-icon');
+  if (restaurant.is_favorite === false || restaurant.is_favorite === "false") {
+    icon.src = "/img/icons/fav-icon-o.png";
+  } else {
+    icon.src = "/img/icons/fav-icon.png";
+  }
+
+  icon.addEventListener('click', () => {
+    if (icon.src.includes("fav-icon-o.png")) {
+      DBHelper.addRestaurantToFav(restaurant.id, true, (err, res) => {
+        icon.src = "/img/icons/fav-icon.png";
+      });
     } else {
-      icon.src = "/img/icons/fav-icon.png";
-    }
-
-    icon.addEventListener('click', () => {
-        if (icon.src.includes("fav-icon-o.png")) {
-          DBHelper.addRestaurantToFav(restaurant.id, true, (err, res) => {
-          icon.src = "/img/icons/fav-icon.png";
-          });
-        } else {
-          DBHelper.addRestaurantToFav(restaurant.id, false, (err, res) => {
-          icon.src = "/img/icons/fav-icon-o.png";
-          });
-        }
+      DBHelper.addRestaurantToFav(restaurant.id, false, (err, res) => {
+        icon.src = "/img/icons/fav-icon-o.png";
       });
-
-      const cuisine = document.getElementById('restaurant-cuisine'); cuisine.innerHTML = restaurant.cuisine_type;
-
-      const address = document.getElementById('restaurant-address'); address.innerHTML = restaurant.address;
-
-      // fill operating hours
-      if (restaurant.operating_hours) {
-        fillRestaurantHoursHTML();
-      }
-      // fetch reviews
-      fetchReviewsFromURL();
     }
+  });
 
-    /**
-     * Create restaurant operating hours HTML table and add it to the webpage.
-     */
-    fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => {
-      const hours = document.getElementById('restaurant-hours');
-      for (let key in operatingHours) {
-        const row = document.createElement('tr');
+  const cuisine = document.getElementById('restaurant-cuisine');
+  cuisine.innerHTML = restaurant.cuisine_type;
 
-        const day = document.createElement('td');
-        day.innerHTML = key;
-        row.appendChild(day);
+  const address = document.getElementById('restaurant-address');
+  address.innerHTML = restaurant.address;
 
-        const time = document.createElement('td');
-        time.innerHTML = operatingHours[key];
-        row.appendChild(time);
+  // fill operating hours
+  if (restaurant.operating_hours) {
+    fillRestaurantHoursHTML();
+  }
+  // fetch reviews
+  fetchReviewsFromURL();
+}
 
-        hours.appendChild(row);
-      }
-    }
+/**
+ * Create restaurant operating hours HTML table and add it to the webpage.
+ */
+fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => {
+  const hours = document.getElementById('restaurant-hours');
+  for (let key in operatingHours) {
+    const row = document.createElement('tr');
 
-    /**
-     * Create all reviews HTML and add them to the webpage.
-     */
-    fillReviewsHTML = (reviews = self.reviews) => {
-      const container = document.getElementById('reviews-container');
-      const title = document.createElement('h3');
-      title.innerHTML = 'Reviews';
-      container.appendChild(title);
+    const day = document.createElement('td');
+    day.innerHTML = key;
+    row.appendChild(day);
 
-      if (!reviews) {
-        const noReviews = document.createElement('p');
-        noReviews.innerHTML = 'No reviews yet. Enter yours!';
-        container.appendChild(noReviews);
-        return;
-      }
-      const ul = document.getElementById('reviews-list');
-      reviews.forEach(review => {
-        ul.appendChild(createReviewHTML(review));
-      });
-      container.appendChild(ul);
-    }
+    const time = document.createElement('td');
+    time.innerHTML = operatingHours[key];
+    row.appendChild(time);
 
-    /**
-     * Create review HTML and add it to the webpage.
-     */
-    createReviewHTML = (review) => {
-      const li = document.createElement('li');
-      const name = document.createElement('p');
-      name.className = "reviewName";
-      name.innerHTML = review.name;
-      li.appendChild(name);
+    hours.appendChild(row);
+  }
+}
 
-      const date = document.createElement('p');
-      date.className = "reviewDate";
-      date.innerHTML = review.date;
-      li.appendChild(date);
+/**
+ * Create all reviews HTML and add them to the webpage.
+ */
+fillReviewsHTML = (reviews = self.reviews) => {
+  const container = document.getElementById('reviews-container');
+  const title = document.createElement('h3');
+  title.innerHTML = 'Reviews';
+  container.appendChild(title);
 
-      const rating = document.createElement('p');
-      rating.className = "reviewRating";
-      rating.innerHTML = `Rating: ${review.rating}`;
-      li.appendChild(rating);
+  if (!reviews) {
+    const noReviews = document.createElement('p');
+    noReviews.innerHTML = 'No reviews yet. Enter yours!';
+    container.appendChild(noReviews);
+    return;
+  }
+  const ul = document.getElementById('reviews-list');
+  reviews.forEach(review => {
+    ul.appendChild(createReviewHTML(review));
+  });
+  container.appendChild(ul);
+}
 
-      const comments = document.createElement('p');
-      comments.className = "reviewComments";
-      comments.innerHTML = review.comments;
-      li.appendChild(comments);
+/**
+ * Create review HTML and add it to the webpage.
+ */
+createReviewHTML = (review) => {
+  const li = document.createElement('li');
+  const name = document.createElement('p');
+  name.className = "reviewName";
+  name.innerHTML = review.name;
+  li.appendChild(name);
 
-      return li;
-    }
+  const date = document.createElement('p');
+  date.className = "reviewDate";
+  date.innerHTML = review.date;
+  li.appendChild(date);
 
-    /**
-     * Add restaurant name to the breadcrumb navigation menu
-     */
-    fillBreadcrumb = (restaurant = self.restaurant) => {
-      const breadcrumb = document.getElementById('breadcrumb');
-      const li = document.createElement('li');
-      li.innerHTML = restaurant.name;
-      li.setAttribute('aria-current', 'page');
-      breadcrumb.appendChild(li);
-    }
+  const rating = document.createElement('p');
+  rating.className = "reviewRating";
+  rating.innerHTML = `Rating: ${review.rating}`;
+  li.appendChild(rating);
 
-    /**
-     * Get a parameter by name from page URL.
-     */
-    getParameterByName = (name, url) => {
-      if (!url)
-        url = window.location.href;
-      name = name.replace(/[\[\]]/g, '\\$&');
-      const regex = new RegExp(`[?&]${name}(=([^&#]*)|&|#|$)`),
-        results = regex.exec(url);
-      if (!results)
-        return null;
-      if (!results[2])
-        return '';
-      return decodeURIComponent(results[2].replace(/\+/g, ' '));
-    }
+  const comments = document.createElement('p');
+  comments.className = "reviewComments";
+  comments.innerHTML = review.comments;
+  li.appendChild(comments);
 
-    /**
-     * Submit review.
-     */
-    uploadReview = (restaurant = self.restaurant) => {
-      const id = restaurant.id;
-      const name = document.getElementById("review-name").value;
-      const rating = document.getElementById("review-rating").value;
-      const comment = document.getElementById("review-comment").value;
+  return li;
+}
 
-      // Put all the parameters together and ready to post
-      let review_info = {
-        restaurant_id: id,
-        name: name,
-        rating: rating,
-        comments: comment,
-      }
-      // https://stackoverflow.com/questions/29775797/fetch-post-json-data
-      // https://github.com/github/fetch/issues/263
-      fetch(`${DBHelper.DATABASE_DOMAIN}/reviews/`, {
-          method: 'post',
-          body: JSON.stringify(review_info)
-        })
-        .then(res => res.json())
-        .then(res => {
-          console.log(res);
-          console.log('Review submission was successful!');
-          alert('Review submission was successful!');
-        })
-        .catch(error => {
-          console.log(error);
-          console.log('Network error when submitting your review. We will automatically send your review when online');
-          alert('There was an error when submitting your review. We will automatically send your review when online');
-          DBHelper.insertReviewsToIDBOffline(review_info);
-        });
+/**
+ * Add restaurant name to the breadcrumb navigation menu
+ */
+fillBreadcrumb = (restaurant = self.restaurant) => {
+  const breadcrumb = document.getElementById('breadcrumb');
+  const li = document.createElement('li');
+  li.innerHTML = restaurant.name;
+  li.setAttribute('aria-current', 'page');
+  breadcrumb.appendChild(li);
+}
 
-      // reload the doc and we should see it
-      setTimeout(function () {
-        window.location.reload();
-      }, 1000);
+/**
+ * Get a parameter by name from page URL.
+ */
+getParameterByName = (name, url) => {
+  if (!url)
+    url = window.location.href;
+  name = name.replace(/[\[\]]/g, '\\$&');
+  const regex = new RegExp(`[?&]${name}(=([^&#]*)|&|#|$)`),
+    results = regex.exec(url);
+  if (!results)
+    return null;
+  if (!results[2])
+    return '';
+  return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
 
-      return false;
-    }
+/**
+ * Submit review.
+ */
+uploadReview = (restaurant = self.restaurant) => {
+  const id = restaurant.id;
+  const name = document.getElementById("review-name").value;
+  const rating = document.getElementById("review-rating").value;
+  const comment = document.getElementById("review-comment").value;
+
+  // Put all the parameters together and ready to post
+  let review_info = {
+    restaurant_id: id,
+    name: name,
+    rating: rating,
+    comments: comment,
+  }
+  // https://stackoverflow.com/questions/29775797/fetch-post-json-data
+  // https://github.com/github/fetch/issues/263
+  fetch(`${DBHelper.DATABASE_DOMAIN}/reviews/`, {
+      method: 'post',
+      body: JSON.stringify(review_info)
+    })
+    .then(res => res.json())
+    .then(res => {
+      console.log(res);
+      console.log('Review submission was successful!');
+      alert('Review submission was successful!');
+    })
+    .catch(error => {
+      console.log(error);
+      console.log('Network error when submitting your review. We will automatically send your review when online');
+      alert('There was an error when submitting your review. We will automatically send your review when online');
+      DBHelper.insertReviewsToIDBOffline(review_info);
+    });
+
+  // reload the doc and we should see it
+  setTimeout(function () {
+    window.location.reload();
+  }, 1000);
+
+  return false;
+}
 
 
-    /**
-     * Check if offline reviews in database
-     */
-    (checkReviewsOffline = () => {
-      // debugger;
-      DBHelper.insertOfflineReviews();
-      // debugger;
-    })();
+/**
+ * Check if offline reviews in database
+ */
+(checkReviewsOffline = () => {
+  DBHelper.insertOfflineReviews();
+})();

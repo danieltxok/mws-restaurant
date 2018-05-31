@@ -89,10 +89,10 @@ self.addEventListener('fetch', event => {
     // delays the event until the promise resolves
     event.respondWith(
 
-        // // Network falling back to cache strategy
-        // fetch(event.request).catch(function () {
-        //     return caches.match(event.request);
-        // })
+        // Network falling back to cache strategy
+        fetch(event.request).catch(function () {
+            return caches.match(event.request);
+        })
 
         // // Offline first strategy would be ideal
         // // Check in cache for the request
@@ -114,22 +114,22 @@ self.addEventListener('fetch', event => {
         //     });
         // })
 
-        // I will combine both
-        // Network falling back to cache
-        // But if network successful, put into cache
-        fetch(event.request).then(response => {
-            // Open the cache
-            caches.open(responsesCache).then(cache => {
+        // // I will combine both
+        // // Network falling back to cache
+        // // But if network successful, put into cache
+        // fetch(event.request).then(response => {
+        //     // Open the cache
+        //     caches.open(responsesCache).then(cache => {
 
-                // Put the request/response(cloned) in the cache
-                cache.put(event.request, response.clone());
+        //         // Put the request/response(cloned) in the cache
+        //         cache.put(event.request, response.clone());
 
-                // return response
-                return response;
-            });
-        }).catch(function () {
-            return caches.match(event.request);
-        })
+        //         // return response
+        //         return response;
+        //     });
+        // }).catch(function () {
+        //     return caches.match(event.request);
+        // })
 
     );
 

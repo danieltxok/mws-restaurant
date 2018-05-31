@@ -346,42 +346,16 @@ class DBHelper {
   }
 
   /**
-   * Insert reviews to offline store.
+   * Add restaurant to favourites.
    */
-  static insertReviewsToIDBOffline(review_info) {
-    const DB_NAME_OFFLINE = 'udacity-offline';
-    const DB_VERSION_OFFLINE = 1;
-    const DB_STORE_NAME_OFFLINE = 'offline';
-
-    // Get correct IDB for all browsers
-    const indexedDBOffline = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
-    // Let us open our database
-    const reqOffline = indexedDBOffline.open(DB_NAME_OFFLINE, DB_VERSION_OFFLINE);
-    // onupgradeneeded is the only place where you can alter the structure of the database
-    // it is triggered when a database of a bigger version number than the existing stored database is loaded
-    // or when there is no previous database
-    // we execute it before onsucess to create the store
-    reqOffline.onupgradeneeded = () => {
-      const datab = reqOffline.result;
-      const offlinestore = datab.createObjectStore(DB_STORE_NAME_OFFLINE, {
-        keyPath: "restaurant_id"
-      });
-    };
-
-    // // if success
-    reqOffline.onsuccess = () => {
-      // Start with a transaction to store values in the previously created objectStore.
-      const datab = reqOffline.result;
-      const transac = datab.transaction(DB_STORE_NAME_OFFLINE, "readwrite");
-      const offlinestore = transac.objectStore(DB_STORE_NAME_OFFLINE);
-      // Store data
-      // if there is another entry in the store with the same key (in this case restaurant_id) it will overwrite it. This way, only one review per user per restaurant when offline
-      offlinestore.put(review_info);
-    }
-
-    // // if error
-    reqOffline.onerror = e => console.error('IDB error: ' + e);
-    // console.log(review_info);
+  static addRestaurantToFav(restaurantId, isFav, callback) {
+    const url = DBHelper.DATABASE_URL + '/' + restaurantId + '/?is_favorite=' + isFav;
+    console.log(isFav);
+    fetch(url, {
+        method: 'put'
+      })
+      .then(res => callback(null, 1))
+      .catch(err => callback(err, null));
   }
 
   /**
@@ -420,6 +394,28 @@ class DBHelper {
 
     // // if error
     reqOffline.onerror = e => console.error('IDB error: ' + e);
+  }
+
+  /**
+   * Check if offline reviews exist
+   */
+  static checkOfflineReviews() {
+    const DB_NAME_OFFLINE = 'udacity-offline';
+    const DB_VERSION_OFFLINE = 1;
+    const DB_STORE_NAME_OFFLINE = 'offline';
+
+    const indexedDBSync = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+    const offlineSync = indexedDBSync.open(DB_NAME_OFFLINE, DB_VERSION_OFFLINE);
+
+    offlineSync.onsuccess = () => {
+      // Start with a transaction to store values in the previously created objectStore.
+      const databaseoff = offlineSync.result;
+      const requestdelete = databaseoff.transaction(DB_STORE_NAME_OFFLINE, "readwrite").objectStore(DB_STORE_NAME_OFFLINE).delete(key);
+
+      requestdelete.onsuccess = () => {
+        console.log('Offline review removed from IndexedDB');
+      };
+    }
   }
 
   /**
@@ -470,7 +466,7 @@ class DBHelper {
   }
 
   /**
-   * Insert offline reviews to server.
+   * Remove offline reviews from store.
    */
   static removeOfflineReviews(key) {
     const DB_NAME_OFFLINE = 'udacity-offline';
@@ -489,20 +485,6 @@ class DBHelper {
         console.log('Offline review removed from IndexedDB');
       };
     }
-
-  }
-
-  /**
-   * Add restaurant to favourites.
-   */
-  static addRestaurantToFav(restaurantId, isFav, callback) {
-    const url = DBHelper.DATABASE_URL + '/' + restaurantId + '/?is_favorite=' + isFav;
-    console.log(isFav);
-    fetch(url, {
-        method: 'put'
-      })
-      .then(res => callback(null, 1))
-      .catch(err => callback(err, null));
   }
 
 }
